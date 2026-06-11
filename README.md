@@ -165,6 +165,8 @@ Project ini dibuat untuk:
 ## 👤 Author
 
 **Zetta Yemima Arini Uktolseja**
+**Femilia Mutiara Marjono**
+**Sahla Awaisyah**
 Program Studi D3 Sistem Informasi
 Fakultas Ilmu Komputer
 Universitas Pembangunan Nasional Veteran Jakarta
