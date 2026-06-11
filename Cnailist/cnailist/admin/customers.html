@@ -1,0 +1,332 @@
+﻿<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Pelanggan - Cnailist Admin</title>
+  <link rel="stylesheet" href="css/admin.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="preconnect" href="https://cdnjs.cloudflare.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+</head>
+<body>
+<div class="admin-wrapper">
+
+  <aside class="sidebar" id="adminSidebar">
+    <div class="sidebar-brand">
+      <div class="brand-icon">💅</div>
+      <div><div class="brand-text">Cnailist</div><div class="brand-sub">Admin Panel</div></div>
+    </div>
+    <nav class="sidebar-nav">
+      <div class="nav-section-label">Menu Utama</div>
+      <a href="index.html" class="nav-item"><i class="fas fa-chart-pie nav-icon"></i><span class="nav-label">Dashboard</span></a>
+      <a href="products.html" class="nav-item"><i class="fas fa-box nav-icon"></i><span class="nav-label">Produk</span></a>
+      <a href="orders.html" class="nav-item"><i class="fas fa-shopping-bag nav-icon"></i><span class="nav-label">Pesanan</span></a>
+      <a href="customers.html" class="nav-item active"><i class="fas fa-users nav-icon"></i><span class="nav-label">Pelanggan</span></a>
+      <a href="chat.html" class="nav-item"><i class="fas fa-comments nav-icon"></i><span class="nav-label">Chat</span></a>
+      <div class="nav-section-label">Pengaturan</div>
+      <a href="login.html" onclick="event.preventDefault();adminLogout()" class="nav-item"><i class="fas fa-sign-out-alt nav-icon"></i><span class="nav-label">Keluar</span></a>
+    </nav>
+    <div class="sidebar-footer">
+      <div class="admin-profile">
+        <div class="admin-avatar">A</div>
+        <div><div class="admin-name">Admin</div><div class="admin-role">Super Admin</div></div>
+      </div>
+    </div>
+  </aside>
+
+  <div class="main-content" id="mainContent">
+    <header class="topbar">
+      <div class="topbar-left">
+        <button class="toggle-btn" onclick="toggleSidebar()"><i class="fas fa-bars"></i></button>
+        <span class="page-title">Pelanggan</span>
+      </div>
+      <div class="topbar-right">
+        <div class="topbar-search">
+          <i class="fas fa-search"></i>
+          <input type="text" placeholder="Cari nama / no. HP..." oninput="applySearch()" id="topSearch" />
+        </div>
+        <button class="topbar-icon-btn"><i class="fas fa-bell"></i><span class="topbar-notif-badge"></span></button>
+      </div>
+    </header>
+
+    <div class="page-content">
+
+      <!-- STAT CARDS -->
+      <div class="stats-grid" style="grid-template-columns:repeat(3,1fr);margin-bottom:24px">
+        <div class="stat-card">
+          <div class="stat-icon pink"><i class="fas fa-users" style="color:#e91e8c"></i></div>
+          <div class="stat-info"><h3 id="statTotal">-</h3><p>Total Pelanggan</p></div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon blue"><i class="fas fa-shopping-bag" style="color:#2196f3"></i></div>
+          <div class="stat-info"><h3 id="statAvgOrder">-</h3><p>Rata-rata Pesanan</p></div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon green"><i class="fas fa-wallet" style="color:#4caf50"></i></div>
+          <div class="stat-info"><h3 id="statAvgSpend">-</h3><p>Rata-rata Belanja</p></div>
+        </div>
+      </div>
+
+      <!-- FILTER BAR -->
+      <div class="filter-bar">
+        <div class="search-box" style="max-width:280px">
+          <i class="fas fa-search"></i>
+          <input type="text" placeholder="Cari nama / no. HP..." id="searchInput" oninput="applySearch()" />
+        </div>
+        <div style="margin-left:auto">
+          <button class="btn-outline-admin" onclick="exportCustomers()"><i class="fas fa-download"></i> Export CSV</button>
+        </div>
+      </div>
+
+      <!-- TABLE -->
+      <div class="card">
+        <div class="card-header">
+          <h3>Daftar Pelanggan <span id="custCount" style="font-size:0.8rem;color:#888;font-weight:500"></span></h3>
+          <p style="font-size:0.78rem;color:#aaa;margin-top:2px">Data otomatis dari riwayat pesanan</p>
+        </div>
+        <div style="overflow-x:auto">
+          <table class="admin-table">
+            <thead>
+              <tr>
+                <th>Pelanggan</th>
+                <th>No. HP</th>
+                <th>Alamat</th>
+                <th>Total Pesanan</th>
+                <th>Total Belanja</th>
+                <th>Pesanan Terakhir</th>
+                <th>Aksi</th>
+              </tr>
+            </thead>
+            <tbody id="custTableBody"></tbody>
+          </table>
+        </div>
+        <div class="pagination" id="pagination"></div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- MODAL DETAIL PELANGGAN -->
+<div class="modal-overlay" id="custDetailModal">
+  <div class="modal-box modal-lg">
+    <div class="modal-header">
+      <h3>Detail Pelanggan</h3>
+      <button class="modal-close" onclick="closeModal('custDetailModal')">&times;</button>
+    </div>
+    <div class="modal-body" id="custDetailBody"></div>
+    <div class="modal-footer">
+      <button class="btn-sm btn-sm-danger" id="deleteCustomerBtn" style="display:none;margin-right:auto" onclick="deleteCustomer('')">Hapus Pelanggan</button>
+      <button class="btn-outline-admin" onclick="closeModal('custDetailModal')">Tutup</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="adminToast"></div>
+<script src="js/admin.js"></script>
+<script src="../js/api.js"></script>
+<script src="js/notif.js"></script>
+<script>
+  let localCustomers = [];
+  let filteredCustomers = [];
+  const PER_PAGE = 10;
+  let currentPage = 1;
+
+  async function loadCustomers() {
+    try {
+      const res = await customerAPI.getAll();
+      localCustomers = res.data || [];
+    } catch (e) {
+      showToast('Gagal memuat data pelanggan.', 'error');
+      localCustomers = [];
+    }
+    filteredCustomers = [...localCustomers];
+    updateStats();
+    renderCustomers();
+  }
+
+  function updateStats() {
+    const total = localCustomers.length;
+    const avgOrder = total ? Math.round(localCustomers.reduce((s, c) => s + (c.orders || 0), 0) / total) : 0;
+    const avgSpend = total ? Math.round(localCustomers.reduce((s, c) => s + (c.total_spent || 0), 0) / total) : 0;
+    document.getElementById('statTotal').textContent    = total;
+    document.getElementById('statAvgOrder').textContent = avgOrder + 'x';
+    document.getElementById('statAvgSpend').textContent = formatRp(avgSpend);
+  }
+
+  function applySearch() {
+    const q = (document.getElementById('searchInput')?.value || document.getElementById('topSearch')?.value || '').toLowerCase();
+    filteredCustomers = localCustomers.filter(c =>
+      (c.name || '').toLowerCase().includes(q) ||
+      (c.phone || '').toLowerCase().includes(q)
+    );
+    currentPage = 1;
+    renderCustomers();
+  }
+
+  function renderCustomers() {
+    document.getElementById('custCount').textContent = `(${filteredCustomers.length} pelanggan)`;
+
+    const start = (currentPage - 1) * PER_PAGE;
+    const page  = filteredCustomers.slice(start, start + PER_PAGE);
+
+    document.getElementById('custTableBody').innerHTML = page.map(c => `
+      <tr>
+        <td>
+          <div style="display:flex;align-items:center;gap:10px">
+            <div style="width:36px;height:36px;border-radius:50%;background:#fce4ec;display:flex;align-items:center;justify-content:center;font-weight:700;color:#e91e8c;font-size:0.9rem;flex-shrink:0">
+              ${(c.name || '?').charAt(0).toUpperCase()}
+            </div>
+            <span style="font-weight:600">${c.name || '-'}</span>
+          </div>
+        </td>
+        <td style="font-size:0.85rem">${c.phone || '-'}</td>
+        <td style="font-size:0.8rem;color:#666;max-width:180px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis" title="${c.address || ''}">${c.address || '-'}</td>
+        <td style="text-align:center">
+          <span style="background:#fce4ec;color:#e91e8c;padding:3px 10px;border-radius:20px;font-weight:700;font-size:0.82rem">${c.orders || 0}x</span>
+        </td>
+        <td style="font-weight:700;color:#e91e8c">${formatRp(c.total_spent || 0)}</td>
+        <td style="font-size:0.82rem;color:#888">${formatDate(c.last_order_at || c.created_at)}</td>
+        <td>
+          <button class="btn-sm btn-sm-info" onclick="viewCustomer('${encodeURIComponent(c.phone)}')" title="Lihat Pesanan">
+            <i class="fas fa-eye"></i>
+          </button>
+          <button class="btn-sm btn-sm-danger" onclick="deleteCustomer('${encodeURIComponent(c.phone)}')" title="Hapus Pelanggan">
+            <i class="fas fa-trash"></i>
+          </button>
+        </td>
+      </tr>
+    `).join('') || `<tr><td colspan="7" style="text-align:center;padding:40px;color:#aaa"><i class="fas fa-users" style="font-size:2rem;margin-bottom:10px;display:block;opacity:0.3"></i>Belum ada pelanggan</td></tr>`;
+
+    renderPagination(filteredCustomers.length);
+  }
+
+  function renderPagination(total) {
+    const pages = Math.ceil(total / PER_PAGE);
+    const el    = document.getElementById('pagination');
+    if (pages <= 1) { el.innerHTML = ''; return; }
+    let html = `<button class="page-btn" onclick="goPage(${currentPage-1})" ${currentPage===1?'disabled':''}>‹</button>`;
+    for (let i = 1; i <= pages; i++)
+      html += `<button class="page-btn ${i===currentPage?'active':''}" onclick="goPage(${i})">${i}</button>`;
+    html += `<button class="page-btn" onclick="goPage(${currentPage+1})" ${currentPage===pages?'disabled':''}>›</button>`;
+    el.innerHTML = html;
+  }
+
+  function goPage(p) {
+    const pages = Math.ceil(filteredCustomers.length / PER_PAGE);
+    if (p < 1 || p > pages) return;
+    currentPage = p;
+    renderCustomers();
+  }
+
+  async function viewCustomer(phoneEncoded) {
+    const phone = decodeURIComponent(phoneEncoded);
+    try {
+      const res = await customerAPI.getOne(phone);
+      const c   = res.data;
+      const orders = Array.isArray(c.orders) ? c.orders : [];
+
+      document.getElementById('custDetailBody').innerHTML = `
+        <!-- Header profil -->
+        <div style="display:flex;align-items:center;gap:16px;margin-bottom:24px;padding-bottom:20px;border-bottom:1px solid #f0d0dc">
+          <div style="width:60px;height:60px;border-radius:50%;background:#fce4ec;display:flex;align-items:center;justify-content:center;font-weight:800;color:#e91e8c;font-size:1.4rem;flex-shrink:0">
+            ${(c.name || '?').charAt(0).toUpperCase()}
+          </div>
+          <div>
+            <h2 style="font-size:1.1rem;font-weight:700;margin-bottom:2px">${c.name}</h2>
+            <p style="font-size:0.83rem;color:#666"><i class="fas fa-phone" style="color:#e91e8c;margin-right:4px"></i>${c.phone || '-'}</p>
+            <p style="font-size:0.78rem;color:#aaa;margin-top:2px"><i class="fas fa-map-marker-alt" style="margin-right:4px"></i>${c.address || '-'}</p>
+          </div>
+          <div style="margin-left:auto;text-align:right">
+            <p style="font-size:0.75rem;color:#aaa">Pertama pesan</p>
+            <p style="font-size:0.82rem;font-weight:600">${formatDate(c.created_at)}</p>
+          </div>
+        </div>
+
+        <!-- Stats mini -->
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;margin-bottom:24px">
+          <div style="background:#fdf0f5;border-radius:12px;padding:14px;text-align:center">
+            <p style="font-size:0.72rem;color:#888;margin-bottom:4px">Total Pesanan</p>
+            <p style="font-size:1.4rem;font-weight:800;color:#e91e8c">${orders.length}</p>
+          </div>
+          <div style="background:#fdf0f5;border-radius:12px;padding:14px;text-align:center">
+            <p style="font-size:0.72rem;color:#888;margin-bottom:4px">Total Belanja</p>
+            <p style="font-size:1rem;font-weight:800;color:#e91e8c">${formatRp(c.total_spent || 0)}</p>
+          </div>
+          <div style="background:#fdf0f5;border-radius:12px;padding:14px;text-align:center">
+            <p style="font-size:0.72rem;color:#888;margin-bottom:4px">Rata-rata/Order</p>
+            <p style="font-size:1rem;font-weight:800;color:#e91e8c">${formatRp(orders.length ? Math.round((c.total_spent||0)/orders.length) : 0)}</p>
+          </div>
+        </div>
+
+        <!-- Riwayat pesanan -->
+        <h4 style="font-size:0.9rem;font-weight:700;margin-bottom:12px">Riwayat Pesanan</h4>
+        ${orders.length > 0 ? orders.map(o => `
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:12px 0;border-bottom:1px solid #f5f5f5">
+            <div>
+              <p style="font-weight:700;font-size:0.85rem;color:#e91e8c">${o.id}</p>
+              <p style="font-size:0.78rem;color:#888">${formatDate(o.created_at)}</p>
+              ${o.items ? `<p style="font-size:0.75rem;color:#aaa;margin-top:2px">${o.items.length} item</p>` : ''}
+            </div>
+            <div style="text-align:right">
+              <p style="font-weight:700;font-size:0.88rem">${formatRp(o.total)}</p>
+              ${statusBadge(o.status)}
+            </div>
+          </div>
+        `).join('') : '<p style="color:#aaa;font-size:0.85rem">Belum ada pesanan</p>'}
+      `;
+      const deleteBtn = document.getElementById('deleteCustomerBtn');
+      if (deleteBtn) {
+        deleteBtn.style.display = 'inline-flex';
+        deleteBtn.onclick = () => deleteCustomer(encodeURIComponent(c.phone));
+      }
+
+      openModal('custDetailModal');
+    } catch (e) {
+      showToast('Gagal memuat detail pelanggan', 'error');
+    }
+  }
+
+  function deleteCustomer(phoneEncoded) {
+    const phone = decodeURIComponent(phoneEncoded);
+    confirmDelete(`Hapus pelanggan ${phone} dan semua pesanan terkait?`, async () => {
+      try {
+        await customerAPI.remove(phone);
+        showToast('Pelanggan berhasil dihapus', 'success');
+        closeModal('custDetailModal');
+        await loadCustomers();
+      } catch (e) {
+        showToast(e.message || 'Gagal menghapus pelanggan', 'error');
+      }
+    });
+  }
+
+  function exportCustomers() {
+    const rows = [['Nama','No. HP','Alamat','Total Pesanan','Total Belanja','Pesanan Terakhir']];
+    localCustomers.forEach(c => rows.push([
+      c.name || '-',
+      c.phone || '-',
+      (c.address || '-').replace(/,/g, ' '),
+      c.orders || 0,
+      c.total_spent || 0,
+      (c.last_order_at || '').slice(0, 10),
+    ]));
+    const csv = rows.map(r => r.join(',')).join('\n');
+    const a   = document.createElement('a');
+    a.href    = 'data:text/csv;charset=utf-8,' + encodeURIComponent(csv);
+    a.download = 'pelanggan-cnailist.csv';
+    a.click();
+    showToast('Data berhasil diexport!', 'success');
+  }
+
+  document.addEventListener('DOMContentLoaded', () => {
+    if (!requireAdminAuth()) return;
+    setAdminUIInfo();
+    loadCustomers();
+  });
+</script>
+</body>
+</html>

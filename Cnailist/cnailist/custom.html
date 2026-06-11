@@ -1,0 +1,791 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Custom Order - Cnailist</title>
+  <link rel="stylesheet" href="css/style.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="preconnect" href="https://cdnjs.cloudflare.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+  <style>
+    :root {
+      --pink-primary: #e91e8c;
+      --pink-pale: #fce4ec;
+      --pink-soft: #fdf0f5;
+    }
+
+    /* HERO CUSTOM */
+    .custom-hero {
+      background: linear-gradient(135deg, #e91e8c 0%, #c2185b 50%, #ad1457 100%);
+      padding: 60px 40px;
+      text-align: center;
+      color: #fff;
+    }
+
+    .custom-hero h1 {
+      font-size: 2.4rem;
+      font-weight: 800;
+      margin-bottom: 12px;
+    }
+
+    .custom-hero p {
+      font-size: 1.05rem;
+      opacity: 0.9;
+      margin-bottom: 36px;
+    }
+
+    .step-indicator {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0;
+      flex-wrap: wrap;
+    }
+
+    .step-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(255,255,255,0.15);
+      border-radius: 30px;
+      padding: 10px 20px;
+      font-size: 0.88rem;
+      font-weight: 600;
+    }
+
+    .step-num {
+      width: 26px;
+      height: 26px;
+      background: rgba(255,255,255,0.3);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.78rem;
+      font-weight: 800;
+    }
+
+    .step-arrow {
+      color: rgba(255,255,255,0.5);
+      font-size: 1.2rem;
+      padding: 0 8px;
+    }
+
+    /* LOCKED STATE */
+    .custom-section {
+      max-width: 680px;
+      margin: 48px auto;
+      padding: 0 20px;
+    }
+
+    .locked-card {
+      background: #fff;
+      border-radius: 20px;
+      box-shadow: 0 8px 40px rgba(233,30,140,0.1);
+      padding: 48px 40px;
+      text-align: center;
+      border: 1.5px solid var(--pink-pale);
+    }
+
+    .locked-icon {
+      font-size: 3.5rem;
+      margin-bottom: 20px;
+      display: block;
+    }
+
+    .locked-card h2 {
+      font-size: 1.5rem;
+      font-weight: 800;
+      color: #222;
+      margin-bottom: 12px;
+    }
+
+    .locked-card p {
+      color: #666;
+      font-size: 0.92rem;
+      line-height: 1.7;
+      margin-bottom: 28px;
+    }
+
+    .btn-chat-admin {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--pink-primary);
+      color: #fff;
+      border: none;
+      border-radius: 30px;
+      padding: 14px 32px;
+      font-size: 0.95rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: background 0.2s, transform 0.15s, box-shadow 0.2s;
+      box-shadow: 0 4px 16px rgba(233,30,140,0.35);
+      font-family: inherit;
+      text-decoration: none;
+      margin-bottom: 16px;
+    }
+
+    .btn-chat-admin:hover {
+      background: #c2185b;
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(233,30,140,0.45);
+    }
+
+    .btn-already-chat {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: transparent;
+      color: var(--pink-primary);
+      border: 2px solid var(--pink-primary);
+      border-radius: 30px;
+      padding: 11px 28px;
+      font-size: 0.88rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+      font-family: inherit;
+    }
+
+    .btn-already-chat:hover {
+      background: var(--pink-soft);
+    }
+
+    /* FORM STATE */
+    .custom-form-card {
+      background: #fff;
+      border-radius: 20px;
+      box-shadow: 0 8px 40px rgba(233,30,140,0.1);
+      padding: 40px;
+      border: 1.5px solid var(--pink-pale);
+    }
+
+    .custom-form-card h2 {
+      font-size: 1.4rem;
+      font-weight: 800;
+      color: #222;
+      margin-bottom: 6px;
+    }
+
+    .custom-form-card .form-subtitle {
+      color: #888;
+      font-size: 0.88rem;
+      margin-bottom: 28px;
+    }
+
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+
+    .form-group {
+      margin-bottom: 20px;
+    }
+
+    .form-group label {
+      display: block;
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: #333;
+      margin-bottom: 7px;
+    }
+
+    .form-group label .required {
+      color: var(--pink-primary);
+      margin-left: 2px;
+    }
+
+    .form-group input,
+    .form-group textarea,
+    .form-group select {
+      width: 100%;
+      padding: 11px 14px;
+      border: 1.5px solid #f0d0dc;
+      border-radius: 10px;
+      font-size: 0.88rem;
+      font-family: inherit;
+      outline: none;
+      transition: border-color 0.2s;
+      background: #fff;
+      box-sizing: border-box;
+    }
+
+    .form-group input:focus,
+    .form-group textarea:focus,
+    .form-group select:focus {
+      border-color: var(--pink-primary);
+    }
+
+    .form-group textarea {
+      resize: vertical;
+      min-height: 90px;
+    }
+
+    /* Upload area */
+    .upload-area {
+      border: 2px dashed #f0d0dc;
+      border-radius: 12px;
+      padding: 24px;
+      text-align: center;
+      cursor: pointer;
+      background: var(--pink-soft);
+      transition: all 0.2s;
+    }
+
+    .upload-area:hover,
+    .upload-area.dragover {
+      border-color: var(--pink-primary);
+      background: var(--pink-pale);
+    }
+
+    .upload-area i {
+      font-size: 2rem;
+      color: var(--pink-primary);
+      margin-bottom: 8px;
+      display: block;
+    }
+
+    .upload-area p {
+      font-size: 0.82rem;
+      color: #888;
+      margin: 0;
+    }
+
+    .upload-area .upload-hint {
+      font-size: 0.72rem;
+      color: #bbb;
+      margin-top: 4px;
+    }
+
+    .upload-previews {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-top: 12px;
+    }
+
+    .upload-preview-item {
+      position: relative;
+      width: 80px;
+      height: 80px;
+      border-radius: 10px;
+      overflow: hidden;
+      border: 2px solid var(--pink-pale);
+    }
+
+    .upload-preview-item img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .upload-preview-item .remove-img {
+      position: absolute;
+      top: 2px;
+      right: 2px;
+      background: rgba(0,0,0,0.55);
+      color: #fff;
+      border: none;
+      border-radius: 50%;
+      width: 20px;
+      height: 20px;
+      font-size: 0.65rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* Budget radio */
+    .budget-options {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    .budget-option {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 14px;
+      border: 1.5px solid #f0d0dc;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: all 0.2s;
+      font-size: 0.84rem;
+    }
+
+    .budget-option:hover {
+      border-color: var(--pink-primary);
+      background: var(--pink-soft);
+    }
+
+    .budget-option input[type="radio"] {
+      accent-color: var(--pink-primary);
+      width: 16px;
+      height: 16px;
+      flex-shrink: 0;
+    }
+
+    .budget-option input[type="radio"]:checked + span {
+      color: var(--pink-primary);
+      font-weight: 600;
+    }
+
+    .budget-option:has(input:checked) {
+      border-color: var(--pink-primary);
+      background: var(--pink-soft);
+    }
+
+    .btn-submit-custom {
+      width: 100%;
+      padding: 15px;
+      background: var(--pink-primary);
+      color: #fff;
+      border: none;
+      border-radius: 12px;
+      font-size: 1rem;
+      font-weight: 700;
+      cursor: pointer;
+      font-family: inherit;
+      transition: background 0.2s, transform 0.15s, box-shadow 0.2s;
+      box-shadow: 0 4px 16px rgba(233,30,140,0.3);
+      margin-top: 8px;
+    }
+
+    .btn-submit-custom:hover {
+      background: #c2185b;
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(233,30,140,0.4);
+    }
+
+    /* SUCCESS MODAL */
+    #successCustomModal .modal-box {
+      text-align: center;
+    }
+
+    .req-number {
+      background: var(--pink-pale);
+      border-radius: 10px;
+      padding: 12px 20px;
+      margin: 16px 0;
+      font-size: 0.88rem;
+    }
+
+    .req-number span {
+      font-weight: 800;
+      color: var(--pink-primary);
+      font-size: 1rem;
+    }
+
+    @media (max-width: 600px) {
+      .custom-hero h1 { font-size: 1.7rem; }
+      .step-indicator { gap: 6px; }
+      .step-arrow { display: none; }
+      .locked-card { padding: 32px 20px; }
+      .custom-form-card { padding: 24px 16px; }
+      .form-row { grid-template-columns: 1fr; }
+      .budget-options { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- NAVBAR -->
+  <nav class="navbar">
+    <a href="index.html" class="navbar-brand">Cnailist</a>
+    <ul class="navbar-nav">
+      <li><a href="index.html">Beranda</a></li>
+      <li><a href="collection.html">Produk</a></li>
+      <li><a href="custom.html" class="active">Custom Order</a></li>
+      <li><a href="index.html#tentang">Tentang Kami</a></li>
+      <li><a href="index.html#kontak">Kontak</a></li>
+    </ul>
+    <div class="navbar-right">
+      <i class="fas fa-search search-icon"></i>
+      <a href="cart.html" class="cart-wrapper">
+        <i class="fas fa-shopping-bag cart-icon"></i>
+        <span class="cart-badge" style="display:none">0</span>
+      </a>
+      <button class="btn-login btn-nav-auth" onclick="window.location.href='tracking.html'">
+        <i class="fas fa-search" style="margin-right:5px;font-size:0.8rem"></i>Cek Pesanan
+      </button>
+    </div>
+  </nav>
+
+  <!-- PAGE HEADER -->
+  <div class="page-header">
+    <a href="index.html">Beranda</a> &rsaquo; <span>Custom Order</span>
+  </div>
+
+  <!-- SECTION 1: HERO -->
+  <section class="custom-hero">
+    <h1>Custom Nail Design 💅</h1>
+    <p>Wujudkan kuku impianmu dengan desain yang sepenuhnya personal</p>
+    <div class="step-indicator">
+      <div class="step-item">
+        <span class="step-num">1</span>
+        Chat Admin
+      </div>
+      <span class="step-arrow">›</span>
+      <div class="step-item">
+        <span class="step-num">2</span>
+        Isi Form
+      </div>
+      <span class="step-arrow">›</span>
+      <div class="step-item">
+        <span class="step-num">3</span>
+        Konfirmasi
+      </div>
+    </div>
+  </section>
+
+  <!-- SECTION 2: LOCKED STATE -->
+  <div class="custom-section" id="lockedState">
+    <div class="locked-card">
+      <span class="locked-icon">🔒</span>
+      <h2>Konsultasi Dulu dengan Admin</h2>
+      <p>
+        Custom order membutuhkan diskusi terlebih dahulu mengenai desain, warna, ukuran, dan harga.
+        Silakan chat dengan admin kami untuk mendapatkan penawaran terbaik sesuai keinginanmu.
+      </p>
+      <div style="display:flex;flex-direction:column;align-items:center;gap:12px">
+        <button class="btn-chat-admin" onclick="window.toggleChat()">
+          💬 Chat dengan Admin Sekarang
+        </button>
+        <button class="btn-already-chat" onclick="unlockForm()">
+          Saya sudah chat admin →
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- SECTION 3: FORM STATE -->
+  <div class="custom-section" id="formState" style="display:none">
+    <div class="custom-form-card">
+      <h2>Form Custom Order 💅</h2>
+      <p class="form-subtitle">Isi detail pesanan custom kamu di bawah ini. Admin akan menghubungimu untuk konfirmasi.</p>
+
+      <form id="customOrderForm" onsubmit="submitCustomOrder(event)">
+
+        <div class="form-row">
+          <div class="form-group">
+            <label>Nama Lengkap <span class="required">*</span></label>
+            <input type="text" id="co_name" placeholder="Nama lengkap kamu" required />
+          </div>
+          <div class="form-group">
+            <label>No. WhatsApp <span class="required">*</span></label>
+            <input type="tel" id="co_phone" placeholder="08xx-xxxx-xxxx" required />
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Inspirasi Desain <span class="required">*</span></label>
+          <textarea id="co_design" placeholder="Deskripsikan desain yang kamu inginkan, warna, motif, tema..." required></textarea>
+        </div>
+
+        <div class="form-group">
+          <label>Upload Referensi Gambar <span style="color:#aaa;font-weight:400">(maks. 3 gambar)</span></label>
+          <div class="upload-area" id="uploadArea"
+            onclick="document.getElementById('co_images').click()"
+            ondragover="event.preventDefault();this.classList.add('dragover')"
+            ondragleave="this.classList.remove('dragover')"
+            ondrop="handleReferenceDrop(event)">
+            <i class="fas fa-cloud-upload-alt"></i>
+            <p>Klik atau drag &amp; drop gambar referensi di sini</p>
+            <p class="upload-hint">JPG, PNG, WEBP (maks. 3 gambar)</p>
+          </div>
+          <input type="file" id="co_images" accept="image/*" multiple style="display:none" onchange="handleReferenceUpload(this)" />
+          <div class="upload-previews" id="uploadPreviews"></div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label>Ukuran Kuku <span class="required">*</span></label>
+            <select id="co_size" required>
+              <option value="" disabled selected>Pilih ukuran</option>
+              <option value="XS">XS (Extra Small)</option>
+              <option value="S">S (Small)</option>
+              <option value="M">M (Medium)</option>
+              <option value="L">L (Large)</option>
+              <option value="XL">XL (Extra Large)</option>
+              <option value="unknown">Saya tidak tahu ukurannya</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Jumlah Set <span class="required">*</span></label>
+            <input type="number" id="co_qty" min="1" value="1" required />
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Deadline / Tanggal Dibutuhkan <span class="required">*</span></label>
+          <input type="date" id="co_deadline" required />
+        </div>
+
+        <div class="form-group">
+          <label>Budget Range <span class="required">*</span></label>
+          <div class="budget-options">
+            <label class="budget-option">
+              <input type="radio" name="co_budget" value="Rp 100K-200K" required />
+              <span>Rp 100K – 200K</span>
+            </label>
+            <label class="budget-option">
+              <input type="radio" name="co_budget" value="Rp 200K-350K" />
+              <span>Rp 200K – 350K</span>
+            </label>
+            <label class="budget-option">
+              <input type="radio" name="co_budget" value="Rp 350K-500K" />
+              <span>Rp 350K – 500K</span>
+            </label>
+            <label class="budget-option">
+              <input type="radio" name="co_budget" value="Lebih dari Rp 500K" />
+              <span>Lebih dari Rp 500K</span>
+            </label>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Catatan Tambahan</label>
+          <textarea id="co_notes" placeholder="Informasi tambahan yang ingin kamu sampaikan..."></textarea>
+        </div>
+
+        <button type="submit" class="btn-submit-custom">
+          <i class="fas fa-paper-plane" style="margin-right:8px"></i>Kirim Request Custom Order
+        </button>
+
+      </form>
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <h3>Cnailist</h3>
+        <p>Toko kuku palsu terpercaya dengan koleksi terlengkap dan berkualitas tinggi.</p>
+      </div>
+      <div class="footer-col">
+        <h4>Tentang Kami</h4>
+        <ul><li>Tentang Cnailist</li><li>Tim Kami</li><li>Blog</li></ul>
+      </div>
+      <div class="footer-col">
+        <h4>Layanan</h4>
+        <ul><li>FAQ</li><li>Kebijakan Pengembalian</li><li>Panduan Ukuran</li></ul>
+      </div>
+      <div class="footer-col">
+        <h4>Kontak</h4>
+        <ul><li>hello@cnailist.id</li><li>@cnailist</li></ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>&copy; 2026 Cnailist. All rights reserved.</p>
+    </div>
+  </footer>
+
+  <!-- MODAL SUKSES CUSTOM ORDER -->
+  <div class="modal-overlay" id="successCustomModal" onclick="if(event.target===this)closeSuccessModal()">
+    <div class="modal-box" style="text-align:center">
+      <button class="modal-close" onclick="closeSuccessModal()">&times;</button>
+      <div style="font-size:3.5rem;margin-bottom:16px">🎨</div>
+      <h2 style="margin-bottom:8px">Request Terkirim!</h2>
+      <p style="color:#555;margin-bottom:6px">Admin kami akan menghubungimu via WhatsApp dalam <strong>1x24 jam</strong>.</p>
+      <p style="font-size:0.85rem;color:#888;margin-bottom:16px">Pastikan nomor WhatsApp kamu aktif ya! 💕</p>
+      <div class="req-number">
+        Nomor Request: <span id="reqNumber">REQ-000000</span>
+      </div>
+      <button class="btn-primary" style="width:100%;margin-top:8px" onclick="window.location.href='index.html'">
+        Kembali ke Beranda
+      </button>
+      <button class="btn-outline" style="width:100%;margin-top:10px" onclick="closeSuccessModal()">
+        Buat Request Baru
+      </button>
+    </div>
+  </div>
+
+  <!-- TOAST -->
+  <div class="toast" id="toast"></div>
+
+  <script src="js/app.js"></script>
+  <script src="js/api.js"></script>
+  <script src="js/chat.js"></script>
+  <script>
+    // ===== UPLOAD REFERENSI GAMBAR =====
+    let referenceImages = []; // { name, data (base64) } — untuk preview
+    let _referenceFiles = []; // File objects — untuk upload ke API
+
+    function handleReferenceUpload(input) {
+      const files = Array.from(input.files);
+      addReferenceFiles(files);
+      // Reset input agar bisa upload file yang sama lagi
+      input.value = '';
+    }
+
+    function handleReferenceDrop(event) {
+      event.preventDefault();
+      document.getElementById('uploadArea').classList.remove('dragover');
+      const files = Array.from(event.dataTransfer.files).filter(f => f.type.startsWith('image/'));
+      addReferenceFiles(files);
+    }
+
+    function addReferenceFiles(files) {
+      if (referenceImages.length >= 3) {
+        showToast('Maksimal 3 gambar referensi!');
+        return;
+      }
+      const remaining = 3 - referenceImages.length;
+      const toAdd = files.slice(0, remaining);
+
+      toAdd.forEach(file => {
+        _referenceFiles.push(file);
+        const reader = new FileReader();
+        reader.onload = e => {
+          referenceImages.push({ name: file.name, data: e.target.result });
+          renderPreviews();
+        };
+        reader.readAsDataURL(file);
+      });
+
+      if (files.length > remaining) {
+        showToast('Hanya ' + remaining + ' gambar lagi yang bisa ditambahkan (maks. 3)');
+      }
+    }
+
+    function removeReferenceImage(index) {
+      referenceImages.splice(index, 1);
+      _referenceFiles.splice(index, 1);
+      renderPreviews();
+    }
+
+    function renderPreviews() {
+      const container = document.getElementById('uploadPreviews');
+      container.innerHTML = referenceImages.map((img, i) => `
+        <div class="upload-preview-item">
+          <img src="${img.data}" alt="${img.name}" />
+          <button class="remove-img" onclick="removeReferenceImage(${i})" title="Hapus gambar">&times;</button>
+        </div>
+      `).join('');
+
+      // Sembunyikan upload area jika sudah 3
+      const area = document.getElementById('uploadArea');
+      area.style.display = referenceImages.length >= 3 ? 'none' : 'block';
+    }
+
+    // ===== UNLOCK FORM =====
+    function unlockForm() {
+      const locked = document.getElementById('lockedState');
+      const form   = document.getElementById('formState');
+      locked.style.display = 'none';
+      form.style.display   = 'block';
+      form.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+
+    // ===== SUBMIT CUSTOM ORDER =====
+    async function submitCustomOrder(event) {
+      event.preventDefault();
+
+      const name     = document.getElementById('co_name').value.trim();
+      const phone    = document.getElementById('co_phone').value.trim();
+      const design   = document.getElementById('co_design').value.trim();
+      const size     = document.getElementById('co_size').value;
+      const qty      = document.getElementById('co_qty').value;
+      const deadline = document.getElementById('co_deadline').value;
+      const budget   = document.querySelector('input[name="co_budget"]:checked')?.value;
+      const notes    = document.getElementById('co_notes').value.trim();
+
+      // Validasi
+      if (!name || !phone || !design || !size || !qty || !deadline || !budget) {
+        showToast('Lengkapi semua field yang wajib diisi!');
+        return;
+      }
+
+      // Validasi nomor WA: minimal 8 digit, boleh diawali +62 atau 08, boleh ada spasi/strip
+      if (!/^(\+62|62|0)[0-9\s\-]{7,14}$/.test(phone)) {
+        showToast('Format nomor WhatsApp tidak valid!');
+        return;
+      }
+
+      const btn = document.querySelector('.btn-submit-custom');
+      btn.disabled  = true;
+      btn.innerHTML = '<i class="fas fa-spinner fa-spin" style="margin-right:8px"></i>Mengirim...';
+
+      try {
+        // Kirim ke backend via FormData (supaya bisa include file)
+        const formData = new FormData();
+        formData.append('name',        name);
+        formData.append('phone',       phone);
+        formData.append('design_desc', design);
+        formData.append('nail_size',   size);
+        formData.append('qty',         qty);
+        formData.append('deadline',    deadline);
+        formData.append('budget',      budget);
+        formData.append('notes',       notes);
+
+        // Attach file referensi (dari File object, bukan base64)
+        const fileInput = document.getElementById('co_images');
+        if (_referenceFiles.length > 0) {
+          _referenceFiles.forEach(file => formData.append('images', file));
+        }
+
+        const res = await customOrderAPI.create(formData);
+        const reqId = res.id;
+
+        // Tampilkan modal sukses
+        document.getElementById('reqNumber').textContent = reqId;
+        document.getElementById('successCustomModal').classList.add('active');
+
+      } catch (e) {
+        // Fallback: simpan ke localStorage kalau backend tidak tersedia
+        if (e.message && e.message.includes('fetch')) {
+          const reqId = 'REQ-' + Date.now().toString().slice(-8);
+          const orders = JSON.parse(localStorage.getItem('cnailist_custom_orders') || '[]');
+          orders.push({
+            id: reqId, name, phone,
+            design_desc: design,
+            nail_size: size,
+            qty: parseInt(qty),
+            deadline, budget, notes,
+            images: referenceImages.map(img => img.name),
+            status: 'Pending',
+            date: new Date().toISOString(),
+            _offline: true,
+          });
+          localStorage.setItem('cnailist_custom_orders', JSON.stringify(orders));
+          document.getElementById('reqNumber').textContent = reqId;
+          document.getElementById('successCustomModal').classList.add('active');
+          showToast('Tersimpan offline. Akan dikirim saat backend aktif.', 'info');
+        } else {
+          showToast(e.message || 'Gagal mengirim request. Coba lagi.');
+        }
+      } finally {
+        btn.disabled  = false;
+        btn.innerHTML = '<i class="fas fa-paper-plane" style="margin-right:8px"></i>Kirim Request Custom Order';
+      }
+    }
+
+    // ===== TUTUP MODAL SUKSES =====
+    function closeSuccessModal() {
+      document.getElementById('successCustomModal').classList.remove('active');
+      // Reset form dan kembali ke state awal
+      document.getElementById('customOrderForm').reset();
+      referenceImages = [];
+      _referenceFiles = [];
+      renderPreviews();
+      document.getElementById('lockedState').style.display = 'block';
+      document.getElementById('formState').style.display = 'none';
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    // Set min date untuk deadline (hari ini)
+    document.addEventListener('DOMContentLoaded', () => {
+      const today = new Date().toISOString().split('T')[0];
+      document.getElementById('co_deadline').min = today;
+    });
+  </script>
+</body>
+</html>

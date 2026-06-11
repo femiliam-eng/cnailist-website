@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Koleksi Kuku Palsu - Cnailist</title>
+  <link rel="stylesheet" href="css/style.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="preconnect" href="https://cdnjs.cloudflare.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+</head>
+<body>
+
+  <!-- NAVBAR -->
+  <nav class="navbar">
+    <a href="index.html" class="navbar-brand">Cnailist</a>
+    <ul class="navbar-nav">
+      <li><a href="index.html">Beranda</a></li>
+      <li><a href="collection.html" class="active">Produk</a></li>
+      <li><a href="custom.html">Custom Order</a></li>
+      <li><a href="index.html#tentang">Tentang Kami</a></li>
+      <li><a href="index.html#kontak">Kontak</a></li>
+    </ul>
+    <div class="navbar-right">
+      <i class="fas fa-search search-icon" onclick="toggleSearch()"></i>
+      <a href="cart.html" class="cart-wrapper">
+        <i class="fas fa-shopping-bag cart-icon"></i>
+        <span class="cart-badge" style="display:none">0</span>
+      </a>
+      <button class="btn-login btn-nav-auth" onclick="window.location.href='tracking.html'">
+        <i class="fas fa-search" style="margin-right:5px;font-size:0.8rem"></i>Cek Pesanan
+      </button>
+    </div>
+  </nav>
+
+  <!-- SEARCH BAR (hidden by default) -->
+  <div id="searchBar" style="display:none; padding:12px 60px; background:#fff; border-bottom:1px solid #f0d0dc;">
+    <input type="text" id="searchInput" placeholder="Cari produk kuku palsu..." 
+      style="width:100%;padding:10px 16px;border:1.5px solid #f06292;border-radius:20px;font-size:0.9rem;outline:none;font-family:inherit"
+      oninput="filterProducts()" />
+  </div>
+
+  <!-- PAGE HEADER -->
+  <div class="page-header">
+    <a href="index.html">Beranda</a> &rsaquo; <span>Koleksi Kuku Palsu</span>
+  </div>
+
+  <!-- COLLECTION LAYOUT -->
+  <div class="collection-layout">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+      <h3>Kategori</h3>
+      <ul class="category-list" id="categoryList">
+        <li class="active" data-cat="Semua" onclick="selectCategory(this, 'Semua')">
+          <span>Semua</span>
+        </li>
+        <li data-cat="Elegan" onclick="selectCategory(this, 'Elegan')">
+          <input type="checkbox" id="cat-elegan" /> <label for="cat-elegan">Elegan</label>
+        </li>
+        <li data-cat="Glamour" onclick="selectCategory(this, 'Glamour')">
+          <input type="checkbox" id="cat-glamour" /> <label for="cat-glamour">Glamour</label>
+        </li>
+        <li data-cat="Minimalis" onclick="selectCategory(this, 'Minimalis')">
+          <input type="checkbox" id="cat-minimalis" /> <label for="cat-minimalis">Minimalis</label>
+        </li>
+      </ul>
+
+      <div class="price-filter">
+        <h4>Filter Harga</h4>
+        <input type="range" class="price-range-slider" id="priceRange" min="0" max="200000" value="150000" step="5000" oninput="updatePriceLabel(this.value); filterProducts()" />
+        <div class="price-labels">
+          <span>Rp 50K</span>
+          <span id="priceMax">Rp 150K</span>
+        </div>
+      </div>
+    </aside>
+
+    <!-- MAIN CONTENT -->
+    <main class="collection-main">
+      <div class="collection-header">
+        <h2>Koleksi Kuku Palsu</h2>
+        <select class="sort-select" id="sortSelect" onchange="filterProducts()">
+          <option value="default">Sort: Pilihan</option>
+          <option value="name-asc">Nama A-Z</option>
+          <option value="name-desc">Nama Z-A</option>
+          <option value="price-asc">Harga Terendah</option>
+          <option value="price-desc">Harga Tertinggi</option>
+        </select>
+      </div>
+
+      <div class="collection-grid" id="collectionGrid"></div>
+    </main>
+  </div>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <h3>Cnailist</h3>
+        <p>Toko kuku palsu terpercaya dengan koleksi terlengkap dan berkualitas tinggi.</p>
+      </div>
+      <div class="footer-col">
+        <h4>Tentang Kami</h4>
+        <ul><li>Tentang Cnailist</li><li>Tim Kami</li><li>Blog</li></ul>
+      </div>
+      <div class="footer-col">
+        <h4>Layanan</h4>
+        <ul><li>FAQ</li><li>Kebijakan Pengembalian</li><li>Panduan Ukuran</li></ul>
+      </div>
+      <div class="footer-col">
+        <h4>Kontak</h4>
+        <ul><li>hello@cnailist.id</li><li>@cnailist</li></ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>&copy; 2026 Cnailist. All rights reserved.</p>
+    </div>
+  </footer>
+
+  <div class="toast" id="toast"></div>
+
+  <script src="js/app.js"></script>
+  <script src="js/api.js"></script>
+  <script src="js/chat.js"></script>
+
+  <script>
+    let activeCategory = 'Semua';
+    // Cache produk yang sudah di-load
+    let _allProducts = [];
+
+    async function initCollection() {
+      // Skeleton loading
+      const grid = document.getElementById('collectionGrid');
+      grid.innerHTML = Array(8).fill(`
+        <div style="background:#f5f5f5;border-radius:14px;overflow:hidden;border:1px solid #f0d0dc;animation:pulse 1.4s ease-in-out infinite">
+          <div style="width:100%;height:180px;background:#eee"></div>
+          <div style="padding:12px 14px">
+            <div style="height:14px;background:#e0e0e0;border-radius:6px;margin-bottom:8px"></div>
+            <div style="height:12px;background:#e8e8e8;border-radius:6px;width:60%"></div>
+          </div>
+        </div>
+      `).join('');
+
+      await loadProductsFromAPI();
+      _allProducts = [...products];
+      filterProducts();
+    }
+
+    function selectCategory(el, cat) {
+      activeCategory = cat;
+      document.querySelectorAll('.category-list li').forEach(li => {
+        li.classList.remove('active');
+        const cb = li.querySelector('input[type="checkbox"]');
+        if (cb) cb.checked = false;
+      });
+      el.classList.add('active');
+      const cb = el.querySelector('input[type="checkbox"]');
+      if (cb) cb.checked = true;
+      filterProducts();
+    }
+
+    function updatePriceLabel(val) {
+      document.getElementById('priceMax').textContent = 'Rp ' + (val / 1000) + 'K';
+    }
+
+    function toggleSearch() {
+      const bar = document.getElementById('searchBar');
+      bar.style.display = bar.style.display === 'none' ? 'block' : 'none';
+      if (bar.style.display === 'block') document.getElementById('searchInput').focus();
+    }
+
+    function filterProducts() {
+      const searchVal = (document.getElementById('searchInput')?.value || '').toLowerCase();
+      const maxPrice  = parseInt(document.getElementById('priceRange').value);
+      const sortVal   = document.getElementById('sortSelect').value;
+
+      let filtered = _allProducts.filter(p => {
+        const matchCat    = activeCategory === 'Semua' || p.category === activeCategory;
+        const matchPrice  = p.price <= maxPrice;
+        const matchSearch = p.name.toLowerCase().includes(searchVal);
+        return matchCat && matchPrice && matchSearch;
+      });
+
+      if (sortVal === 'name-asc')   filtered.sort((a, b) => a.name.localeCompare(b.name));
+      else if (sortVal === 'name-desc')  filtered.sort((a, b) => b.name.localeCompare(a.name));
+      else if (sortVal === 'price-asc')  filtered.sort((a, b) => a.price - b.price);
+      else if (sortVal === 'price-desc') filtered.sort((a, b) => b.price - a.price);
+
+      renderGrid(filtered);
+    }
+
+    function renderGrid(list) {
+      const grid = document.getElementById('collectionGrid');
+      if (list.length === 0) {
+        grid.innerHTML = `<div style="grid-column:1/-1;text-align:center;padding:60px;color:#aaa;">
+          <div style="font-size:3rem;margin-bottom:12px">💅</div>
+          <p>Tidak ada produk yang ditemukan</p>
+        </div>`;
+        return;
+      }
+      grid.innerHTML = list.map(p => `
+        <div class="product-card" onclick="goTo('detail.html', ${p.id})">
+          <img src="${p.image}" alt="${p.name}" onerror="this.src='images/nail-1.jpeg'" />
+          <div class="product-info">
+            <h3>${p.name}</h3>
+            <p class="product-price">${formatPrice(p.price)}</p>
+            ${p.stock === 0 ? '<p style="font-size:0.75rem;color:#f44336;font-weight:600;margin-bottom:4px">Stok Habis</p>' : ''}
+            <button class="btn-detail" onclick="event.stopPropagation(); goTo('detail.html', ${p.id})">Lihat Detail</button>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    document.addEventListener('DOMContentLoaded', initCollection);
+  </script>
+
+  <style>
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.5; }
+    }
+  </style>
+</body>
+</html>

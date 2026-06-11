@@ -1,0 +1,710 @@
+﻿<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Chat - Cnailist Admin</title>
+  <link rel="stylesheet" href="css/admin.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="preconnect" href="https://cdnjs.cloudflare.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+  <style>
+    .chat-layout {
+      display: flex;
+      height: calc(100vh - 64px);
+      overflow: hidden;
+    }
+
+    /* LIST PANEL */
+    .chat-list-panel {
+      width: 300px;
+      border-right: 1px solid var(--pink-border);
+      display: flex;
+      flex-direction: column;
+      background: #fff;
+      flex-shrink: 0;
+    }
+
+    .chat-list-header {
+      padding: 16px 18px;
+      border-bottom: 1px solid var(--pink-border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .chat-list-header h3 { font-size: 0.95rem; font-weight: 700; }
+
+    .chat-search {
+      padding: 10px 14px;
+      border-bottom: 1px solid var(--pink-border);
+    }
+
+    .chat-search input {
+      width: 100%;
+      padding: 8px 12px;
+      border: 1.5px solid var(--pink-border);
+      border-radius: 20px;
+      font-size: 0.82rem;
+      outline: none;
+      font-family: inherit;
+    }
+
+    .chat-search input:focus { border-color: var(--pink); }
+
+    .chat-list {
+      flex: 1;
+      overflow-y: auto;
+    }
+
+    .chat-list-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 13px 16px;
+      cursor: pointer;
+      border-bottom: 1px solid #f9f9f9;
+      transition: background 0.15s;
+      position: relative;
+    }
+
+    .chat-list-item:hover { background: var(--pink-soft); }
+    .chat-list-item.active { background: var(--pink-pale); }
+
+    .chat-avatar {
+      width: 40px; height: 40px;
+      border-radius: 50%;
+      background: var(--pink-pale);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1rem;
+      flex-shrink: 0;
+      position: relative;
+    }
+
+    .chat-avatar .online-dot {
+      position: absolute;
+      bottom: 1px; right: 1px;
+      width: 10px; height: 10px;
+      background: #4caf50;
+      border-radius: 50%;
+      border: 2px solid #fff;
+    }
+
+    .chat-list-info { flex: 1; min-width: 0; }
+    .chat-list-info h4 { font-size: 0.85rem; font-weight: 600; margin-bottom: 2px; }
+    .chat-list-info p  { font-size: 0.75rem; color: var(--text-gray); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+    .chat-list-meta { display: flex; flex-direction: column; align-items: flex-end; gap: 4px; }
+    .chat-list-time { font-size: 0.68rem; color: var(--text-gray); }
+    .chat-unread-badge {
+      background: var(--pink);
+      color: #fff;
+      font-size: 0.65rem;
+      font-weight: 700;
+      width: 18px; height: 18px;
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+    }
+
+    /* CHAT PANEL */
+    .chat-panel {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      background: #fafafa;
+    }
+
+    .chat-panel-header {
+      background: #fff;
+      padding: 14px 20px;
+      border-bottom: 1px solid var(--pink-border);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .chat-panel-header h3 { font-size: 0.95rem; font-weight: 700; }
+    .chat-panel-header p  { font-size: 0.75rem; color: var(--text-gray); }
+
+    .chat-messages-area {
+      flex: 1;
+      overflow-y: auto;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .msg-row {
+      display: flex;
+      flex-direction: column;
+      margin-bottom: 8px;
+    }
+
+    .msg-row.user  { align-items: flex-start; }
+    .msg-row.admin { align-items: flex-end; }
+
+    .msg-sender {
+      font-size: 0.68rem;
+      font-weight: 700;
+      margin-bottom: 3px;
+      padding: 0 4px;
+    }
+
+    .msg-row.user  .msg-sender { color: #555; }
+    .msg-row.admin .msg-sender { color: var(--pink); }
+
+    .msg-bubble {
+      max-width: 65%;
+      padding: 9px 14px;
+      font-size: 0.84rem;
+      line-height: 1.5;
+      word-break: break-word;
+    }
+
+    .msg-row.user  .msg-bubble { background: #fff; border-radius: 16px 16px 16px 4px; border: 1px solid #eee; color: #333; }
+    .msg-row.admin .msg-bubble { background: var(--pink); border-radius: 16px 16px 4px 16px; color: #fff; }
+
+    .msg-time {
+      font-size: 0.65rem;
+      color: #bbb;
+      margin-top: 3px;
+      padding: 0 4px;
+    }
+
+    .chat-input-area {
+      background: #fff;
+      padding: 12px 16px;
+      border-top: 1px solid var(--pink-border);
+      display: flex;
+      gap: 10px;
+      align-items: flex-end;
+    }
+
+    .chat-input-area textarea {
+      flex: 1;
+      border: 1.5px solid var(--pink-border);
+      border-radius: 14px;
+      padding: 10px 14px;
+      font-size: 0.85rem;
+      outline: none;
+      font-family: inherit;
+      resize: none;
+      max-height: 100px;
+      transition: border-color 0.2s;
+      line-height: 1.5;
+    }
+
+    .chat-input-area textarea:focus { border-color: var(--pink); }
+
+    .btn-send {
+      width: 40px; height: 40px;
+      background: var(--pink);
+      border: none;
+      border-radius: 50%;
+      color: #fff;
+      cursor: pointer;
+      font-size: 0.9rem;
+      display: flex; align-items: center; justify-content: center;
+      transition: background 0.2s;
+      flex-shrink: 0;
+    }
+
+    .btn-send:hover { background: var(--pink-dark, #c2185b); }
+
+    /* EMPTY STATE */
+    .chat-empty {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      color: #bbb;
+      gap: 12px;
+    }
+
+    .chat-empty i { font-size: 3rem; }
+    .chat-empty p { font-size: 0.88rem; }
+  </style>
+</head>
+<body>
+<div class="admin-wrapper">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar" id="adminSidebar">
+    <div class="sidebar-brand">
+      <div class="brand-icon">💅</div>
+      <div><div class="brand-text">Cnailist</div><div class="brand-sub">Admin Panel</div></div>
+    </div>
+    <nav class="sidebar-nav">
+      <div class="nav-section-label">Menu Utama</div>
+      <a href="index.html"     class="nav-item"><i class="fas fa-chart-pie nav-icon"></i><span class="nav-label">Dashboard</span></a>
+      <a href="products.html"  class="nav-item"><i class="fas fa-box nav-icon"></i><span class="nav-label">Produk</span></a>
+      <a href="orders.html"    class="nav-item"><i class="fas fa-shopping-bag nav-icon"></i><span class="nav-label">Pesanan</span></a>
+      <a href="customers.html" class="nav-item"><i class="fas fa-users nav-icon"></i><span class="nav-label">Pelanggan</span></a>
+      <a href="chat.html"      class="nav-item active"><i class="fas fa-comments nav-icon"></i><span class="nav-label">Chat</span><span class="nav-badge" id="sidebarChatBadge" style="display:none">0</span></a>
+      <div class="nav-section-label">Pengaturan</div>
+      <a href="login.html" onclick="event.preventDefault();adminLogout()" class="nav-item"><i class="fas fa-sign-out-alt nav-icon"></i><span class="nav-label">Keluar</span></a>
+    </nav>
+    <div class="sidebar-footer">
+      <div class="admin-profile">
+        <div class="admin-avatar">A</div>
+        <div><div class="admin-name">Admin</div><div class="admin-role">Super Admin</div></div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <div class="main-content" id="mainContent" style="display:flex;flex-direction:column;padding:0">
+
+    <!-- TOPBAR -->
+    <header class="topbar">
+      <div class="topbar-left">
+        <button class="toggle-btn" onclick="toggleSidebar()"><i class="fas fa-bars"></i></button>
+        <span class="page-title">Live Chat</span>
+      </div>
+      <div class="topbar-right">
+        <button class="btn-primary-admin" onclick="refreshChats()" style="font-size:0.8rem;padding:7px 14px">
+          <i class="fas fa-sync-alt"></i> Refresh
+        </button>
+        <button class="topbar-icon-btn"><i class="fas fa-bell"></i><span class="topbar-notif-badge"></span></button>
+      </div>
+    </header>
+
+    <!-- CHAT LAYOUT -->
+    <div class="chat-layout">
+
+      <!-- LIST PANEL -->
+      <div class="chat-list-panel">
+        <div class="chat-list-header">
+          <h3>Percakapan</h3>
+          <span id="totalChats" style="font-size:0.75rem;color:#888"></span>
+        </div>
+        <div class="chat-search">
+          <input type="text" id="chatSearchInput" placeholder="Cari percakapan..." oninput="renderChatList()" />
+        </div>
+        <div class="chat-list" id="chatListEl"></div>
+        <!-- Info kalau kosong -->
+        <div style="padding:10px 14px;border-top:1px solid #f5f5f5;font-size:0.72rem;color:#bbb;text-align:center">
+          Chat masuk otomatis dari halaman customer
+        </div>
+      </div>
+
+      <!-- CHAT PANEL -->
+      <div class="chat-panel" id="chatPanel">
+        <div class="chat-empty" id="chatEmptyState">
+          <i class="fas fa-comments"></i>
+          <p>Pilih percakapan untuk mulai membalas</p>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="adminToast"></div>
+
+<script src="js/admin.js"></script>
+<script src="../js/api.js"></script>
+<script src="js/notif.js"></script>
+<script>
+  // CHAT_KEY sudah didefinisikan di notif.js, pakai langsung
+  let activeSessionId = null;
+  let refreshInterval = null;
+
+  function getAllChats() {
+    return JSON.parse(localStorage.getItem('cnailist_chats') || '{}');
+  }
+
+  function saveAllChats(chats) {
+    localStorage.setItem('cnailist_chats', JSON.stringify(chats));
+  }
+
+  function formatChatTime(iso) {
+    if (!iso) return '';
+    const d = new Date(iso);
+    const now = new Date();
+    const diff = now - d;
+    if (diff < 60000) return 'Baru saja';
+    if (diff < 3600000) return Math.floor(diff/60000) + ' mnt lalu';
+    if (diff < 86400000) return d.toLocaleTimeString('id-ID', {hour:'2-digit',minute:'2-digit'});
+    return d.toLocaleDateString('id-ID', {day:'2-digit',month:'short'});
+  }
+
+  function formatMsgTime(iso) {
+    if (!iso) return '';
+    return new Date(iso).toLocaleTimeString('id-ID', {hour:'2-digit',minute:'2-digit'});
+  }
+
+  function getTotalUnread() {
+    const all = getAllChats();
+    return Object.values(all).reduce((sum, c) => sum + (c.unreadAdmin || 0), 0);
+  }
+
+  function updateSidebarBadge() {
+    const total = getTotalUnread();
+    const badge = document.getElementById('sidebarChatBadge');
+    if (badge) {
+      badge.textContent = total;
+      badge.style.display = total > 0 ? 'inline-flex' : 'none';
+    }
+  }
+
+  function renderChatList() {
+    const all = getAllChats();
+    const search = document.getElementById('chatSearchInput').value.toLowerCase();
+    const sessions = Object.values(all).filter(c =>
+      c.name?.toLowerCase().includes(search) ||
+      c.sessionId?.toLowerCase().includes(search) ||
+      c.messages?.some(m => m.text?.toLowerCase().includes(search))
+    );
+
+    // Sort by latest message
+    sessions.sort((a, b) => {
+      const aLast = a.messages?.[a.messages.length - 1]?.time || '';
+      const bLast = b.messages?.[b.messages.length - 1]?.time || '';
+      return bLast.localeCompare(aLast);
+    });
+
+    document.getElementById('totalChats').textContent = `${sessions.length} percakapan`;
+
+    const el = document.getElementById('chatListEl');
+    if (sessions.length === 0) {
+      el.innerHTML = `<div style="text-align:center;padding:40px 16px;color:#bbb">
+        <i class="fas fa-inbox" style="font-size:2rem;margin-bottom:10px;display:block"></i>
+        <p style="font-size:0.82rem">Belum ada pesan masuk</p>
+      </div>`;
+      return;
+    }
+
+    el.innerHTML = sessions.map(c => {
+      const lastMsg   = c.messages?.[c.messages.length - 1];
+      const unread    = c.unreadAdmin || 0;
+      const initial   = (c.name || 'T').charAt(0).toUpperCase();
+      const hasCustom = c.messages?.some(m => m.text && /custom order|custom nail/i.test(m.text));
+
+      // Preview pesan terakhir — handle teks & foto
+      let lastPreview = 'Belum ada pesan';
+      if (lastMsg) {
+        const prefix = lastMsg.from === 'admin' ? '✓ ' : '';
+        if (lastMsg.type === 'image') {
+          lastPreview = prefix + '📷 Foto';
+        } else {
+          lastPreview = prefix + (lastMsg.text || '');
+        }
+      }
+
+      return `
+        <div class="chat-list-item ${activeSessionId === c.sessionId ? 'active' : ''}"
+          onclick="openChat('${c.sessionId}')">
+          <div class="chat-avatar">
+            ${initial}
+            <span class="online-dot"></span>
+          </div>
+          <div class="chat-list-info">
+            <h4>${c.name || 'Tamu'}${hasCustom ? '<span style="background:#fff3e0;color:#ff9800;font-size:0.65rem;font-weight:700;padding:1px 6px;border-radius:6px;margin-left:4px">Custom</span>' : ''} <span style="font-size:0.68rem;color:#bbb;font-weight:400">#${c.sessionId?.slice(-6)}</span></h4>
+            <p>${lastPreview}</p>
+          </div>
+          <div class="chat-list-meta">
+            <span class="chat-list-time">${lastMsg ? formatChatTime(lastMsg.time) : ''}</span>
+            ${unread > 0 ? `<span class="chat-unread-badge">${unread}</span>` : ''}
+          </div>
+        </div>
+      `;
+    }).join('');
+
+    updateSidebarBadge();
+  }
+
+  function openChat(sessionId) {
+    activeSessionId = sessionId;
+    const all  = getAllChats();
+    const chat = all[sessionId];
+    if (!chat) return;
+
+    // Reset unread via API
+    chatAPI.markRead(sessionId).catch(() => {});
+    chat.unreadAdmin = 0;
+    saveAllChats(all);
+    renderChatList();
+
+    const panel = document.getElementById('chatPanel');
+    panel.innerHTML = `
+      <!-- Header -->
+      <div class="chat-panel-header">
+        <div class="chat-avatar" style="width:38px;height:38px;font-size:0.9rem;background:var(--pink-pale)">
+          ${(chat.name || 'T').charAt(0).toUpperCase()}
+        </div>
+        <div style="flex:1">
+          <h3>${chat.name || 'Tamu'}</h3>
+          <p><span style="display:inline-block;width:7px;height:7px;background:#4caf50;border-radius:50%;margin-right:4px"></span>Online · ID: ${sessionId.slice(-10)}</p>
+        </div>
+        <div style="display:flex;gap:8px">
+          <button class="btn-sm btn-sm-danger" onclick="clearChat('${sessionId}')" title="Hapus percakapan">
+            <i class="fas fa-trash"></i>
+          </button>
+        </div>
+      </div>
+
+      <!-- Messages -->
+      <div class="chat-messages-area" id="adminMsgArea"></div>
+
+      <!-- Preview foto admin -->
+      <div id="adminImgPreviewBar" style="display:none;padding:8px 16px;background:#fdf0f5;border-top:1px solid #f0d0dc;align-items:center;gap:8px;">
+        <img id="adminImgThumb" src="" style="width:44px;height:44px;object-fit:cover;border-radius:8px;border:1px solid #f0d0dc;" />
+        <div style="flex:1;min-width:0">
+          <p id="adminImgName" style="font-size:0.75rem;font-weight:600;color:#333;white-space:nowrap;overflow:hidden;text-overflow:ellipsis"></p>
+          <p style="font-size:0.7rem;color:#aaa">Siap dikirim</p>
+        </div>
+        <button onclick="cancelAdminImg()" style="background:none;border:none;color:#e91e8c;cursor:pointer;font-size:1.1rem;padding:4px">&times;</button>
+      </div>
+
+      <!-- Input -->
+      <div class="chat-input-area">
+        <button onclick="document.getElementById('adminFileInput').click()" title="Kirim foto" style="
+          width:36px;height:36px;border-radius:50%;border:1.5px solid var(--pink-border);
+          background:#fff;color:var(--pink);cursor:pointer;font-size:0.9rem;
+          display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all 0.2s;
+        " onmouseover="this.style.background='var(--pink-pale)'" onmouseout="this.style.background='#fff'">
+          <i class="fas fa-image"></i>
+        </button>
+        <input type="file" id="adminFileInput" accept="image/*" style="display:none" onchange="handleAdminImgSelect(this,'${sessionId}')" />
+        <textarea id="adminChatInput" placeholder="Ketik balasan atau kirim foto..." rows="1"
+          onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendAdminReply('${sessionId}')}"
+          oninput="this.style.height='auto';this.style.height=this.scrollHeight+'px'"></textarea>
+        <button class="btn-send" onclick="sendAdminReply('${sessionId}')">
+          <i class="fas fa-paper-plane"></i>
+        </button>
+      </div>
+    `;
+
+    renderAdminMessages(sessionId);
+    loadChatMessages(sessionId);
+    document.getElementById('adminChatInput')?.focus();
+  }
+
+  function renderAdminMessages(sessionId) {
+    const all  = getAllChats();
+    const chat = all[sessionId];
+    if (!chat) return;
+    const area = document.getElementById('adminMsgArea');
+    if (!area) return;
+
+    if (chat.messages.length === 0) {
+      area.innerHTML = `<div style="text-align:center;padding:40px;color:#bbb;font-size:0.82rem">Belum ada pesan</div>`;
+      return;
+    }
+
+    area.innerHTML = chat.messages.map(m => {
+      const isUser  = m.from === 'user';
+      const sender  = isUser ? (chat.name || 'Tamu') : 'Admin (Kamu)';
+      let bubble = '';
+      if (m.type === 'image') {
+        bubble = `
+          <div class="msg-bubble" style="padding:4px;cursor:pointer;background:transparent;border:none;" onclick="adminOpenImg('${m.image}')">
+            <img src="${m.image}" style="max-width:200px;max-height:160px;border-radius:10px;display:block;object-fit:cover;border:1px solid #eee" />
+            <p style="font-size:0.7rem;color:#aaa;margin-top:4px;text-align:center"><i class="fas fa-search-plus"></i> Klik perbesar</p>
+          </div>`;
+      } else {
+        bubble = `<div class="msg-bubble">${m.text}</div>`;
+      }
+      return `
+        <div class="msg-row ${isUser ? 'user' : 'admin'}">
+          <span class="msg-sender">${sender}</span>
+          ${bubble}
+          <span class="msg-time">${formatMsgTime(m.time)}</span>
+        </div>
+      `;
+    }).join('');
+
+    area.scrollTop = area.scrollHeight;
+  }
+
+  async function sendAdminReply(sessionId) {
+    const input = document.getElementById('adminChatInput');
+    const all   = getAllChats();
+    const chat  = all[sessionId];
+    if (!chat) return;
+
+    let sent = false;
+
+    // Kirim foto kalau ada pending
+    if (_adminPendingFile) {
+      const file = _adminPendingFile;
+      _adminPendingFile = null;
+      document.getElementById('adminImgPreviewBar').style.display = 'none';
+      try {
+        const fd = new FormData();
+        fd.append('image', file);
+        await chatAPI.reply(sessionId, fd);
+        await loadChatMessages(sessionId);
+        showToast('Foto terkirim!', 'success');
+      } catch (e) {
+        showToast('Gagal kirim foto: ' + (e.message || 'server error'), 'error');
+      }
+      sent = true;
+    }
+
+    // Kirim teks kalau ada
+    if (input && input.value.trim()) {
+      const text = input.value.trim();
+      input.value = '';
+      input.style.height = 'auto';
+      try {
+        const fd = new FormData();
+        fd.append('message', text);
+        await chatAPI.reply(sessionId, fd);
+        await loadChatMessages(sessionId);
+        if (!sent) showToast('Pesan terkirim!', 'success');
+      } catch (e) {
+        showToast('Gagal kirim pesan: ' + (e.message || 'server error'), 'error');
+      }
+      sent = true;
+    }
+
+    if (!sent) showToast('Tulis pesan atau pilih foto dulu!', 'error');
+  }
+
+  // ===== FOTO ADMIN =====
+  let _adminPendingFile = null;
+
+  function handleAdminImgSelect(input, sessionId) {
+    const file = input.files[0];
+    if (!file) return;
+    if (file.size > 5 * 1024 * 1024) { showToast('Maks 5MB!', 'error'); return; }
+    _adminPendingFile = file;
+    const reader = new FileReader();
+    reader.onload = e => {
+      document.getElementById('adminImgThumb').src = e.target.result;
+      document.getElementById('adminImgName').textContent = file.name;
+      document.getElementById('adminImgPreviewBar').style.display = 'flex';
+    };
+    reader.readAsDataURL(file);
+    input.value = '';
+  }
+
+  function cancelAdminImg() {
+    _adminPendingFile = null;
+    document.getElementById('adminImgPreviewBar').style.display = 'none';
+  }
+
+  // ===== LIGHTBOX =====
+  function adminOpenImg(src) {
+    let ov = document.getElementById('adminImgOverlay');
+    if (!ov) {
+      ov = document.createElement('div');
+      ov.id = 'adminImgOverlay';
+      ov.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:99999;display:flex;align-items:center;justify-content:center;cursor:zoom-out;padding:20px;';
+      ov.onclick = () => ov.remove();
+      document.body.appendChild(ov);
+    }
+    ov.innerHTML = `
+      <div style="position:relative;max-width:90vw;max-height:90vh">
+        <img src="${src}" style="max-width:100%;max-height:90vh;border-radius:12px;display:block;box-shadow:0 8px 40px rgba(0,0,0,0.5)" />
+        <button onclick="document.getElementById('adminImgOverlay').remove()" style="position:absolute;top:-12px;right:-12px;background:#e91e8c;color:#fff;border:none;width:32px;height:32px;border-radius:50%;font-size:1rem;cursor:pointer;display:flex;align-items:center;justify-content:center;">&times;</button>
+        <a href="${src}" download="foto-chat.jpg" onclick="event.stopPropagation()" style="position:absolute;bottom:-12px;right:-12px;background:#333;color:#fff;border:none;width:32px;height:32px;border-radius:50%;font-size:0.85rem;display:flex;align-items:center;justify-content:center;text-decoration:none;" title="Download"><i class="fas fa-download"></i></a>
+      </div>
+    `;
+    document.body.appendChild(ov);
+  }
+
+  async function clearChat(sessionId) {
+    confirmDelete('Hapus semua percakapan ini?', async () => {
+      try {
+        await chatAPI.deleteSession(sessionId);
+      } catch (_) { /* offline */ }
+      const all = getAllChats();
+      delete all[sessionId];
+      saveAllChats(all);
+      activeSessionId = null;
+      document.getElementById('chatPanel').innerHTML = `
+        <div class="chat-empty" id="chatEmptyState">
+          <i class="fas fa-comments"></i>
+          <p>Pilih percakapan untuk mulai membalas</p>
+        </div>
+      `;
+      loadChatSessions();
+      showToast('Percakapan dihapus.', 'error');
+    });
+  }
+
+  function refreshChats() {
+    loadChatSessions();
+    if (activeSessionId) loadChatMessages(activeSessionId);
+    showToast('Chat diperbarui!', 'success');
+  }
+
+  // Confirm modal (reuse dari admin.js)
+  document.body.insertAdjacentHTML('beforeend', `
+    <div class="modal-overlay" id="confirmModal">
+      <div class="modal-box modal-sm">
+        <div class="modal-header"><h3>Konfirmasi</h3><button class="modal-close" onclick="closeModal('confirmModal')">&times;</button></div>
+        <div class="modal-body"><p id="confirmMsg" style="font-size:0.9rem;color:#555"></p></div>
+        <div class="modal-footer">
+          <button class="btn-outline-admin" onclick="closeModal('confirmModal')">Batal</button>
+          <button class="btn-sm btn-sm-danger" style="padding:9px 20px;font-size:0.85rem" id="confirmOkBtn">Ya, Hapus</button>
+        </div>
+      </div>
+    </div>
+  `);
+
+  // Auto refresh setiap 3 detik
+  document.addEventListener('DOMContentLoaded', () => {
+    setAdminUIInfo();
+    if (typeof isAdminLoggedIn === 'function' && !isAdminLoggedIn()) {
+      window.location.href = 'login.html';
+      return;
+    }
+    loadChatSessions();
+    refreshInterval = setInterval(() => {
+      loadChatSessions();
+      if (activeSessionId) loadChatMessages(activeSessionId);
+    }, 3000);
+  });
+
+  // ===== LOAD DARI API =====
+  async function loadChatSessions() {
+    try {
+      const res = await chatAPI.getSessions();
+      // Sinkron ke localStorage untuk kompatibilitas notif
+      const all = {};
+      res.data.forEach(s => {
+        all[s.session_id] = {
+          sessionId: s.session_id,
+          name: s.name || 'Tamu',
+          unreadAdmin: s.unread || 0,
+          messages: [], // diisi saat buka chat
+          _lastMsg: s.last_message,
+          _lastType: s.last_type,
+          _lastTime: s.last_message_at,
+        };
+      });
+      localStorage.setItem('cnailist_chats', JSON.stringify(all));
+    } catch (_) { /* fallback localStorage */ }
+    renderChatList();
+  }
+
+  async function loadChatMessages(sessionId) {
+    try {
+      const res = await chatAPI.getMessages(sessionId);
+      const all  = getAllChats();
+      if (!all[sessionId]) all[sessionId] = { sessionId, name: 'Tamu', unreadAdmin: 0, messages: [] };
+      all[sessionId].messages = res.data.map(m => ({
+        id:    m.id,
+        from:  m.from,
+        type:  m.type,
+        text:  m.message,
+        image: m.image_path ? 'http://localhost/cnailist-laravel-backend/public/storage/chat/' + m.image_path : null,
+        time:  m.created_at,
+        read:  !!m.is_read,
+      }));
+      saveAllChats(all);
+    } catch (_) { /* pakai data yang ada */ }
+    renderAdminMessages(sessionId);
+  }
+
+</script>
+</body>
+</html>

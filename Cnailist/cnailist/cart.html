@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Keranjang Belanja - Cnailist</title>
+  <link rel="stylesheet" href="css/style.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="preconnect" href="https://cdnjs.cloudflare.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+</head>
+<body>
+
+  <!-- NAVBAR -->
+  <nav class="navbar">
+    <a href="index.html" class="navbar-brand">Cnailist</a>
+    <ul class="navbar-nav">
+      <li><a href="index.html">Beranda</a></li>
+      <li><a href="collection.html">Produk</a></li>
+      <li><a href="custom.html">Custom Order</a></li>
+      <li><a href="index.html#tentang">Tentang Kami</a></li>
+      <li><a href="index.html#kontak">Kontak</a></li>
+    </ul>
+    <div class="navbar-right">
+      <a href="cart.html" class="cart-wrapper">
+        <i class="fas fa-shopping-bag cart-icon" style="color:#e91e8c"></i>
+        <span class="cart-badge" style="display:none">0</span>
+      </a>
+      <button class="btn-login btn-nav-auth" onclick="window.location.href='tracking.html'">
+        <i class="fas fa-search" style="margin-right:5px;font-size:0.8rem"></i>Cek Pesanan
+      </button>
+    </div>
+  </nav>
+
+  <!-- PAGE HEADER -->
+  <div class="page-header">
+    <a href="index.html">Beranda</a> &rsaquo; <span>Keranjang Belanja</span>
+  </div>
+
+  <!-- CART LAYOUT -->
+  <div class="cart-layout">
+
+    <!-- CART MAIN -->
+    <div class="cart-main">
+      <h2>Keranjang Belanja</h2>
+      <p class="cart-subtitle">Cart List</p>
+
+      <div id="cartContent"></div>
+    </div>
+
+    <!-- CART SIDEBAR -->
+    <div class="cart-sidebar">
+      <h3>Informasi Pengiriman</h3>
+      <div class="form-group">
+        <label>Nama</label>
+        <input type="text" id="shipName" placeholder="Nama lengkap" />
+      </div>
+      <div class="form-group">
+        <label>Alamat</label>
+        <textarea id="shipAddress" placeholder="Alamat lengkap pengiriman" rows="3" style="resize:vertical"></textarea>
+      </div>
+      <div class="form-group">
+        <label>No. Telepon</label>
+        <input type="tel" id="shipPhone" placeholder="+62 812-xxxx-xxxx" />
+      </div>
+
+      <!-- METODE PEMBAYARAN -->
+      <div class="payment-section">
+        <h4>Metode Pembayaran</h4>
+
+        <!-- SEA BANK -->
+        <label class="payment-option-card" id="opt-seabank">
+          <input type="radio" name="payment" value="seabank" checked onchange="switchPayment('seabank')" />
+          <div class="payment-option-inner">
+            <div class="payment-logo seabank-logo">🌊</div>
+            <div>
+              <p class="payment-name">SeaBank</p>
+              <p class="payment-sub">Transfer ke rekening SeaBank</p>
+            </div>
+          </div>
+        </label>
+
+        <!-- GOPAY -->
+        <label class="payment-option-card" id="opt-gopay">
+          <input type="radio" name="payment" value="gopay" onchange="switchPayment('gopay')" />
+          <div class="payment-option-inner">
+            <div class="payment-logo gopay-logo">💚</div>
+            <div>
+              <p class="payment-name">GoPay</p>
+              <p class="payment-sub">Transfer ke akun GoPay</p>
+            </div>
+          </div>
+        </label>
+      </div>
+
+      <!-- INFO REKENING -->
+      <div id="paymentInfo" style="border-radius:12px;padding:14px;margin-bottom:14px;font-size:0.84rem;border:1.5px dashed #f0d0dc;background:#fdf0f5"></div>
+
+      <!-- RINGKASAN HARGA -->
+      <div style="background:#fce4ec;border-radius:10px;padding:14px;margin-bottom:14px">
+        <div style="display:flex;justify-content:space-between;font-size:0.85rem;margin-bottom:6px">
+          <span>Subtotal</span>
+          <span id="sidebarSubtotal">Rp 0</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;font-size:0.85rem;margin-bottom:6px">
+          <span>Ongkos Kirim</span>
+          <span id="sidebarShipping">Rp 0</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;font-size:0.95rem;font-weight:700;border-top:1px solid #f0d0dc;padding-top:8px;margin-top:4px">
+          <span>Total</span>
+          <span id="sidebarTotal" style="color:#e91e8c">Rp 0</span>
+        </div>
+      </div>
+
+      <!-- UPLOAD BUKTI BAYAR -->
+      <div style="margin-bottom:16px">
+        <p style="font-size:0.82rem;font-weight:700;margin-bottom:8px;color:#333">Upload Bukti Pembayaran <span style="color:#e91e8c">*</span></p>
+        <div id="uploadArea" onclick="document.getElementById('proofFile').click()" style="
+          border:2px dashed #f0d0dc;border-radius:12px;padding:20px;
+          text-align:center;cursor:pointer;background:#fdf0f5;
+          transition:all 0.2s;
+        "
+        onmouseover="this.style.borderColor='#e91e8c';this.style.background='#fce4ec'"
+        onmouseout="this.style.borderColor='#f0d0dc';this.style.background='#fdf0f5'">
+          <div id="uploadPlaceholder">
+            <i class="fas fa-cloud-upload-alt" style="font-size:1.8rem;color:#e91e8c;margin-bottom:8px;display:block"></i>
+            <p style="font-size:0.82rem;color:#888">Klik untuk upload screenshot bukti transfer</p>
+            <p style="font-size:0.72rem;color:#bbb;margin-top:4px">JPG, PNG, PDF (maks 5MB)</p>
+          </div>
+          <div id="uploadPreview" style="display:none">
+            <img id="proofPreviewImg" src="" alt="bukti" style="max-width:100%;max-height:140px;border-radius:8px;object-fit:contain" />
+            <p id="proofFileName" style="font-size:0.75rem;color:#e91e8c;margin-top:6px;font-weight:600"></p>
+            <p style="font-size:0.72rem;color:#888">Klik untuk ganti gambar</p>
+          </div>
+        </div>
+        <input type="file" id="proofFile" accept="image/*,.pdf" style="display:none" onchange="handleProofUpload(this)" />
+      </div>
+
+      <button class="btn-checkout" onclick="handleCheckout()">Pesan Sekarang</button>
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <h3>Cnailist</h3>
+        <p>Toko kuku palsu terpercaya dengan koleksi terlengkap dan berkualitas tinggi.</p>
+      </div>
+      <div class="footer-col">
+        <h4>Tentang Kami</h4>
+        <ul><li>Tentang Cnailist</li><li>Tim Kami</li><li>Blog</li></ul>
+      </div>
+      <div class="footer-col">
+        <h4>Layanan</h4>
+        <ul><li>FAQ</li><li>Kebijakan Pengembalian</li><li>Panduan Ukuran</li></ul>
+      </div>
+      <div class="footer-col">
+        <h4>Kontak</h4>
+        <ul><li>hello@cnailist.id</li><li>@cnailist</li></ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>&copy; 2026 Cnailist. All rights reserved.</p>
+    </div>
+  </footer>
+
+  <!-- ORDER SUCCESS MODAL -->
+  <div class="modal-overlay" id="successModal">
+    <div class="modal-box" style="text-align:center">
+      <div style="font-size:3.5rem;margin-bottom:16px">🎉</div>
+      <h2 style="margin-bottom:8px">Pesanan Berhasil!</h2>
+      <p style="margin-bottom:6px">Terima kasih telah berbelanja di Cnailist.</p>
+      <p style="font-size:0.85rem;color:#888;margin-bottom:20px">Pesanan akan diproses setelah pembayaran dikonfirmasi. 💅</p>
+
+      <!-- ID Pesanan -->
+      <div style="background:#fce4ec;border-radius:12px;padding:14px 16px;margin-bottom:10px">
+        <p style="font-size:0.75rem;color:#888;margin-bottom:4px">ID Pesanan Kamu</p>
+        <p id="orderIdText" style="font-size:1.1rem;font-weight:800;color:#e91e8c;letter-spacing:1px"></p>
+        <p style="font-size:0.72rem;color:#aaa;margin-top:4px">Simpan ID ini untuk mengecek status pesananmu</p>
+      </div>
+
+      <!-- Tombol copy -->
+      <button onclick="copyOrderId()" style="background:none;border:1.5px dashed #f0d0dc;border-radius:10px;padding:8px 16px;font-size:0.78rem;color:#e91e8c;cursor:pointer;width:100%;margin-bottom:16px;font-family:inherit;transition:all 0.2s" onmouseover="this.style.background='#fdf0f5'" onmouseout="this.style.background='none'">
+        <i class="fas fa-copy" style="margin-right:6px"></i>Salin ID Pesanan
+      </button>
+
+      <button class="btn-primary" style="width:100%;margin-bottom:10px" onclick="goTracking()">
+        <i class="fas fa-search" style="margin-right:6px"></i>Cek Status Pesanan
+      </button>
+      <button onclick="window.location.href='index.html'" style="width:100%;background:none;border:1.5px solid #f0d0dc;border-radius:12px;padding:11px;font-size:0.88rem;font-weight:600;color:#888;cursor:pointer;font-family:inherit;transition:all 0.2s" onmouseover="this.style.borderColor='#e91e8c';this.style.color='#e91e8c'" onmouseout="this.style.borderColor='#f0d0dc';this.style.color='#888'">
+        Kembali ke Beranda
+      </button>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <script src="js/app.js"></script>
+  <script src="js/api.js"></script>
+  <script src="js/chat.js"></script>
+
+  <script>
+    const SHIPPING_COST = 15000;
+
+    const PAYMENT_INFO = {
+      seabank: {
+        name: 'SeaBank',
+        icon: '🌊',
+        color: '#1565c0',
+        bg: '#e3f2fd',
+        details: [
+          { label: 'No. Rekening', value: '901234567890' },
+          { label: 'Atas Nama',    value: 'Cnailist Store' },
+          { label: 'Bank',         value: 'SeaBank Indonesia' },
+        ],
+        note: 'Transfer sesuai nominal total. Sertakan nama kamu di keterangan transfer.'
+      },
+      gopay: {
+        name: 'GoPay',
+        icon: '💚',
+        color: '#2e7d32',
+        bg: '#e8f5e9',
+        details: [
+          { label: 'No. GoPay',  value: '0812-3456-7890' },
+          { label: 'Atas Nama',  value: 'Cnailist Store' },
+        ],
+        note: 'Transfer via GoPay sesuai nominal total. Screenshot bukti transfer dan upload di bawah.'
+      }
+    };
+
+    let proofFileData = null; // base64 untuk preview
+    let _proofFile    = null; // File object untuk upload ke API
+
+    function switchPayment(method) {
+      // Update card style
+      document.querySelectorAll('.payment-option-card').forEach(el => el.classList.remove('selected'));
+      document.getElementById('opt-' + method)?.classList.add('selected');
+
+      // Render info rekening
+      const info = PAYMENT_INFO[method];
+      const el   = document.getElementById('paymentInfo');
+      el.style.borderColor = info.color;
+      el.style.background  = info.bg;
+      el.innerHTML = `
+        <p style="font-weight:700;color:${info.color};margin-bottom:10px;font-size:0.88rem">${info.icon} Informasi ${info.name}</p>
+        ${info.details.map(d => `
+          <div style="display:flex;justify-content:space-between;margin-bottom:6px">
+            <span style="color:#888">${d.label}</span>
+            <span style="font-weight:700;color:#333;cursor:pointer" onclick="copyText('${d.value}')" title="Klik untuk copy">
+              ${d.value} <i class="fas fa-copy" style="font-size:0.7rem;color:#bbb;margin-left:4px"></i>
+            </span>
+          </div>
+        `).join('')}
+        <p style="font-size:0.75rem;color:#888;margin-top:8px;padding-top:8px;border-top:1px dashed #ddd">
+          <i class="fas fa-info-circle" style="color:${info.color}"></i> ${info.note}
+        </p>
+      `;
+    }
+
+    function copyText(text) {
+      navigator.clipboard.writeText(text).then(() => showToast('Disalin: ' + text));
+    }
+
+    function handleProofUpload(input) {
+      if (!input.files || !input.files[0]) return;
+      const file = input.files[0];
+      if (file.size > 5 * 1024 * 1024) {
+        showToast('Ukuran file maksimal 5MB!');
+        return;
+      }
+      _proofFile = file; // simpan File object
+      const reader = new FileReader();
+      reader.onload = e => {
+        proofFileData = { name: file.name, data: e.target.result, type: file.type };
+        document.getElementById('uploadPlaceholder').style.display = 'none';
+        document.getElementById('uploadPreview').style.display = 'block';
+        if (file.type.startsWith('image/')) {
+          document.getElementById('proofPreviewImg').src = e.target.result;
+          document.getElementById('proofPreviewImg').style.display = 'block';
+        } else {
+          document.getElementById('proofPreviewImg').style.display = 'none';
+        }
+        document.getElementById('proofFileName').textContent = '✓ ' + file.name;
+      };
+      reader.readAsDataURL(file);
+    }
+
+    function renderCart() {
+      const container = document.getElementById('cartContent');
+      if (cart.length === 0) {
+        container.innerHTML = `
+          <div class="empty-cart">
+            <div class="empty-icon">🛍️</div>
+            <h3>Keranjang kamu kosong</h3>
+            <p style="margin-bottom:20px">Yuk, tambahkan produk kuku palsu favoritmu!</p>
+            <a href="collection.html" class="btn-primary">Lihat Koleksi</a>
+          </div>
+        `;
+        updateSummary();
+        return;
+      }
+
+      const rows = cart.map(item => `
+        <tr>
+          <td>
+            <div class="cart-product">
+              <img src="${item.image}" alt="${item.name}" />
+              <div class="cart-product-info">
+                <h4>${item.name}</h4>
+                <p>${item.category}</p>
+              </div>
+            </div>
+          </td>
+          <td class="cart-price">${formatPrice(item.price)}</td>
+          <td>
+            <div style="display:flex;align-items:center;gap:0;border:1px solid #f0d0dc;border-radius:8px;width:fit-content;overflow:hidden">
+              <button onclick="updateQty(${item.id}, -1)" style="background:#fff;border:none;width:28px;height:28px;cursor:pointer;font-size:1rem;color:#333">−</button>
+              <span style="width:32px;text-align:center;font-size:0.88rem;font-weight:600;border-left:1px solid #f0d0dc;border-right:1px solid #f0d0dc;height:28px;line-height:28px">${item.qty}</span>
+              <button onclick="updateQty(${item.id}, 1)" style="background:#fff;border:none;width:28px;height:28px;cursor:pointer;font-size:1rem;color:#333">+</button>
+            </div>
+          </td>
+          <td class="cart-total-price">${formatPrice(item.price * item.qty)}</td>
+          <td><button class="btn-hapus" onclick="handleRemove(${item.id})">Hapus</button></td>
+        </tr>
+      `).join('');
+
+      const subtotal = cart.reduce((sum, item) => sum + item.price * item.qty, 0);
+      container.innerHTML = `
+        <table class="cart-table">
+          <thead><tr><th>Produk</th><th>Harga</th><th>Jumlah</th><th>Total</th><th></th></tr></thead>
+          <tbody>${rows}</tbody>
+        </table>
+        <div class="cart-footer">
+          <span class="cart-total-label">Total:</span>
+          <span class="cart-total-amount">${formatPrice(subtotal + SHIPPING_COST)}</span>
+          <a href="collection.html" class="btn-outline" style="padding:8px 20px;font-size:0.82rem">Lanjut Belanja</a>
+        </div>
+      `;
+      updateSummary();
+    }
+
+    function updateSummary() {
+      const subtotal  = cart.reduce((sum, item) => sum + item.price * item.qty, 0);
+      const shipping  = cart.length > 0 ? SHIPPING_COST : 0;
+      document.getElementById('sidebarSubtotal').textContent = formatPrice(subtotal);
+      document.getElementById('sidebarShipping').textContent = formatPrice(shipping);
+      document.getElementById('sidebarTotal').textContent    = formatPrice(subtotal + shipping);
+    }
+
+    function updateQty(id, delta) {
+      const item = cart.find(i => i.id === id);
+      if (!item) return;
+      item.qty += delta;
+      if (item.qty <= 0) cart = cart.filter(i => i.id !== id);
+      saveCart();
+      renderCart();
+    }
+
+    function handleRemove(id) {
+      removeFromCart(id);
+      renderCart();
+      showToast('Produk dihapus dari keranjang');
+    }
+
+    async function handleCheckout() {
+      if (cart.length === 0) { showToast('Keranjang masih kosong!'); return; }
+      const name    = document.getElementById('shipName').value.trim();
+      const address = document.getElementById('shipAddress').value.trim();
+      const phone   = document.getElementById('shipPhone').value.trim();
+      if (!name || !address || !phone) {
+        showToast('Lengkapi informasi pengiriman terlebih dahulu!');
+        return;
+      }
+      if (!proofFileData) {
+        showToast('Upload bukti pembayaran terlebih dahulu!');
+        const area = document.getElementById('uploadArea');
+        area.style.borderColor = '#e91e8c';
+        area.style.background  = '#fce4ec';
+        setTimeout(() => { area.style.borderColor = '#f0d0dc'; area.style.background = '#fdf0f5'; }, 2000);
+        return;
+      }
+
+      const method   = document.querySelector('input[name="payment"]:checked').value;
+      const subtotal = cart.reduce((sum, i) => sum + i.price * i.qty, 0);
+      const total    = subtotal + SHIPPING_COST;
+
+      const btn = document.querySelector('.btn-checkout');
+      btn.disabled     = true;
+      btn.textContent  = 'Memproses...';
+
+      try {
+        // Kirim ke backend
+        const formData = new FormData();
+        formData.append('customer_name',    name);
+        formData.append('customer_phone',   phone);
+        formData.append('customer_address', address);
+        formData.append('payment_method',   method);
+        formData.append('subtotal',         subtotal);
+        formData.append('shipping_cost',    SHIPPING_COST);
+        formData.append('total',            total);
+        formData.append('items',            JSON.stringify(cart.map(i => ({
+          id: i.id, name: i.name, price: i.price, qty: i.qty,
+        }))));
+
+        // Attach bukti pembayaran (File object)
+        if (_proofFile) formData.append('proof', _proofFile);
+
+        const res = await orderAPI.create(formData);
+        const orderId = res.orderId;
+
+        cart = [];
+        saveCart();
+
+        // Simpan orderId dan phone untuk tracking
+        window._lastOrderId = orderId;
+        window._lastPhone   = phone;
+
+        showToast('Pesanan berhasil dipesan');
+        window.location.href = 'tracking.html?order_id=' + encodeURIComponent(orderId) + '&phone=' + encodeURIComponent(phone);
+        return;
+
+      } catch (e) {
+        showToast(e.message || 'Gagal membuat pesanan. Pastikan backend berjalan dan coba lagi.');
+      } finally {
+        btn.disabled    = false;
+        btn.textContent = 'Pesan Sekarang';
+      }
+    }
+
+    function copyOrderId() {
+      const id = window._lastOrderId || document.getElementById('orderIdText').textContent;
+      if (!id) return;
+      navigator.clipboard.writeText(id).then(() => {
+        showToast('ID Pesanan disalin: ' + id + ' 📋');
+      }).catch(() => {
+        // Fallback untuk browser lama
+        const el = document.createElement('textarea');
+        el.value = id;
+        document.body.appendChild(el);
+        el.select();
+        document.execCommand('copy');
+        document.body.removeChild(el);
+        showToast('ID Pesanan disalin! 📋');
+      });
+    }
+
+    function goTracking() {
+      const id    = window._lastOrderId || document.getElementById('orderIdText').textContent;
+      const phone = window._lastPhone   || document.getElementById('shipPhone')?.value.trim() || '';
+      if (!id) return;
+      window.location.href = 'tracking.html?order_id=' + encodeURIComponent(id) + '&phone=' + encodeURIComponent(phone);
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      renderCart();
+      switchPayment('seabank'); // default
+    });
+  </script>
+</body>
+</html>

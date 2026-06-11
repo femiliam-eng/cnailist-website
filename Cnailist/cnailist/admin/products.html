@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Produk - Cnailist Admin</title>
+  <link rel="stylesheet" href="css/admin.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="preconnect" href="https://cdnjs.cloudflare.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+</head>
+<body>
+<div class="admin-wrapper">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar" id="adminSidebar">
+    <div class="sidebar-brand">
+      <div class="brand-icon">💅</div>
+      <div>
+        <div class="brand-text">Cnailist</div>
+        <div class="brand-sub">Admin Panel</div>
+      </div>
+    </div>
+    <nav class="sidebar-nav">
+      <div class="nav-section-label">Menu Utama</div>
+      <a href="index.html" class="nav-item"><i class="fas fa-chart-pie nav-icon"></i><span class="nav-label">Dashboard</span></a>
+      <a href="products.html" class="nav-item active"><i class="fas fa-box nav-icon"></i><span class="nav-label">Produk</span></a>
+      <a href="orders.html" class="nav-item"><i class="fas fa-shopping-bag nav-icon"></i><span class="nav-label">Pesanan</span></a>
+      <a href="customers.html" class="nav-item"><i class="fas fa-users nav-icon"></i><span class="nav-label">Pelanggan</span></a>
+      <a href="chat.html" class="nav-item"><i class="fas fa-comments nav-icon"></i><span class="nav-label">Chat</span></a>
+      <div class="nav-section-label">Pengaturan</div>
+      <a href="login.html" onclick="event.preventDefault();adminLogout()" class="nav-item"><i class="fas fa-sign-out-alt nav-icon"></i><span class="nav-label">Keluar</span></a>
+    </nav>
+    <div class="sidebar-footer">
+      <div class="admin-profile">
+        <div class="admin-avatar">A</div>
+        <div><div class="admin-name">Admin</div><div class="admin-role">Super Admin</div></div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <div class="main-content" id="mainContent">
+    <header class="topbar">
+      <div class="topbar-left">
+        <button class="toggle-btn" onclick="toggleSidebar()"><i class="fas fa-bars"></i></button>
+        <span class="page-title">Manajemen Produk</span>
+      </div>
+      <div class="topbar-right">
+        <div class="topbar-search">
+          <i class="fas fa-search"></i>
+          <input type="text" placeholder="Cari produk..." id="topSearch" oninput="renderTable()" />
+        </div>
+        <button class="topbar-icon-btn"><i class="fas fa-bell"></i><span class="topbar-notif-badge"></span></button>
+      </div>
+    </header>
+
+    <div class="page-content">
+
+      <!-- FILTER BAR -->
+      <div class="filter-bar">
+        <div class="search-box" style="max-width:280px">
+          <i class="fas fa-search"></i>
+          <input type="text" placeholder="Cari nama produk..." id="searchInput" oninput="renderTable()" />
+        </div>
+        <select class="form-control" style="width:auto" id="filterCat" onchange="renderTable()">
+          <option value="">Semua Kategori</option>
+          <option>Glamour</option>
+          <option>Elegan</option>
+          <option>Minimalis</option>
+        </select>
+        <select class="form-control" style="width:auto" id="filterStatus" onchange="renderTable()">
+          <option value="">Semua Status</option>
+          <option>Aktif</option>
+          <option>Nonaktif</option>
+          <option>Habis</option>
+        </select>
+        <div style="margin-left:auto;display:flex;gap:10px">
+          <button class="btn-outline-admin" onclick="exportCSV()"><i class="fas fa-download"></i> Export</button>
+          <button class="btn-primary-admin" onclick="openAddModal()"><i class="fas fa-plus"></i> Tambah Produk</button>
+        </div>
+      </div>
+
+      <!-- TABLE -->
+      <div class="card">
+        <div class="card-header">
+          <h3>Daftar Produk <span id="productCount" style="font-size:0.8rem;color:#888;font-weight:500"></span></h3>
+          <div style="display:flex;gap:8px">
+            <button class="btn-sm btn-sm-pink" onclick="renderTable()"><i class="fas fa-sync-alt"></i></button>
+          </div>
+        </div>
+        <div style="overflow-x:auto">
+          <table class="admin-table">
+            <thead>
+              <tr>
+                <th><input type="checkbox" id="checkAll" onchange="toggleAll(this)" /></th>
+                <th>Produk</th>
+                <th>Kategori</th>
+                <th>Harga</th>
+                <th>Stok</th>
+                <th>Status</th>
+                <th>Aksi</th>
+              </tr>
+            </thead>
+            <tbody id="productTableBody"></tbody>
+          </table>
+        </div>
+        <div class="pagination" id="pagination"></div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- MODAL TAMBAH/EDIT PRODUK -->
+<div class="modal-overlay" id="productModal">
+  <div class="modal-box modal-lg">
+    <div class="modal-header">
+      <h3 id="modalTitle">Tambah Produk Baru</h3>
+      <button class="modal-close" onclick="closeModal('productModal')">&times;</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-row">
+        <div class="form-group">
+          <label>Nama Produk *</label>
+          <input type="text" class="form-control" id="pName" placeholder="Nama produk" />
+        </div>
+        <div class="form-group">
+          <label>Kategori *</label>
+          <select class="form-control" id="pCategory">
+            <option>Glamour</option>
+            <option>Elegan</option>
+            <option>Minimalis</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Harga (Rp) *</label>
+          <input type="number" class="form-control" id="pPrice" placeholder="75000" />
+        </div>
+        <div class="form-group">
+          <label>Stok *</label>
+          <input type="number" class="form-control" id="pStock" placeholder="0" />
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Deskripsi</label>
+        <textarea class="form-control" id="pDesc" placeholder="Deskripsi produk..."></textarea>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Status</label>
+          <select class="form-control" id="pStatus">
+            <option>Aktif</option>
+            <option>Nonaktif</option>
+            <option>Habis</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Gambar Produk</label>
+          <div class="img-upload-area" onclick="document.getElementById('pImageFile').click()">
+            <i class="fas fa-cloud-upload-alt"></i>
+            <p>Klik untuk upload gambar</p>
+            <span>PNG, JPG, JPEG (maks 2MB)</span>
+            <input type="file" id="pImageFile" accept="image/*" style="display:none" onchange="previewImage(this)" />
+          </div>
+          <img id="pImagePreview" src="" style="display:none;width:80px;height:80px;object-fit:cover;border-radius:10px;margin-top:8px;border:1px solid #f0d0dc" />
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-outline-admin" onclick="closeModal('productModal')">Batal</button>
+      <button class="btn-primary-admin" onclick="saveProduct()"><i class="fas fa-save"></i> Simpan</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL DETAIL PRODUK -->
+<div class="modal-overlay" id="detailModal">
+  <div class="modal-box">
+    <div class="modal-header">
+      <h3>Detail Produk</h3>
+      <button class="modal-close" onclick="closeModal('detailModal')">&times;</button>
+    </div>
+    <div class="modal-body" id="detailModalBody"></div>
+  </div>
+</div>
+
+<!-- CONFIRM DELETE -->
+<div class="modal-overlay" id="confirmModal">
+  <div class="modal-box modal-sm">
+    <div class="modal-header">
+      <h3>Konfirmasi Hapus</h3>
+      <button class="modal-close" onclick="closeModal('confirmModal')">&times;</button>
+    </div>
+    <div class="modal-body">
+      <p id="confirmMsg" style="font-size:0.9rem;color:#555"></p>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-outline-admin" onclick="closeModal('confirmModal')">Batal</button>
+      <button class="btn-sm btn-sm-danger" style="padding:9px 20px;font-size:0.85rem" id="confirmOkBtn">Hapus</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="adminToast"></div>
+<script src="js/admin.js"></script>
+<script src="../js/api.js"></script>
+<script src="js/notif.js"></script>
+<script>
+  let localProducts = [];
+  let editingId     = null;
+  const PER_PAGE    = 8;
+  let currentPage   = 1;
+
+  // ===== LOAD DARI API =====
+  async function loadProducts() {
+    try {
+      const res = await productAPI.getAll();
+      localProducts = res.data.map(p => ({
+        ...p,
+        image: productAPI.imageUrl(p),
+      }));
+    } catch (e) {
+      showToast('Gagal memuat produk dari server.', 'error');
+      localProducts = [];
+    }
+    renderTable();
+  }
+
+  async function saveProductToAPI(formData, id = null) {
+    try {
+      if (id) {
+        await productAPI.update(id, formData);
+        showToast('Produk berhasil diperbarui!', 'success');
+      } else {
+        await productAPI.create(formData);
+        showToast('Produk berhasil ditambahkan!', 'success');
+      }
+      await loadProducts();
+      return true;
+    } catch (e) {
+      showToast(e.message || 'Gagal menyimpan produk.', 'error');
+      return false;
+    }
+  }
+
+  async function deleteProductFromAPI(id) {
+    try {
+      await productAPI.remove(id);
+      showToast('Produk dihapus.', 'success');
+      await loadProducts();
+    } catch (e) {
+      showToast(e.message || 'Gagal menghapus produk.', 'error');
+    }
+  }
+
+  function getFiltered() {
+    const search = (document.getElementById('searchInput')?.value || document.getElementById('topSearch')?.value || '').toLowerCase();
+    const cat    = document.getElementById('filterCat').value;
+    const status = document.getElementById('filterStatus').value;
+    return localProducts.filter(p =>
+      p.name.toLowerCase().includes(search) &&
+      (!cat    || p.category === cat) &&
+      (!status || p.status === status)
+    );
+  }
+
+  function renderTable() {
+    const filtered = getFiltered();
+    const total    = filtered.length;
+    document.getElementById('productCount').textContent = `(${total} produk)`;
+
+    const start = (currentPage - 1) * PER_PAGE;
+    const page  = filtered.slice(start, start + PER_PAGE);
+
+    const tbody = document.getElementById('productTableBody');
+    tbody.innerHTML = page.map(p => `
+      <tr>
+        <td><input type="checkbox" class="row-check" value="${p.id}" /></td>
+        <td>
+          <div class="product-thumb">
+            <img src="${p.image}" alt="${p.name}" onerror="this.src='../images/nail-1.jpeg'" />
+            <div class="product-thumb-info">
+              <h4>${p.name}</h4>
+              <p>ID: #${p.id}</p>
+            </div>
+          </div>
+        </td>
+        <td><span class="badge badge-pink">${p.category}</span></td>
+        <td style="font-weight:700">${formatRp(p.price)}</td>
+        <td>
+          <span style="font-weight:700;color:${p.stock === 0 ? '#f44336' : p.stock < 10 ? '#ff9800' : '#4caf50'}">${p.stock}</span>
+          ${p.stock < 10 && p.stock > 0 ? '<span style="font-size:0.7rem;color:#ff9800;margin-left:4px">⚠ Hampir habis</span>' : ''}
+          ${p.stock === 0 ? '<span style="font-size:0.7rem;color:#f44336;margin-left:4px">Habis</span>' : ''}
+        </td>
+        <td>${statusBadge(p.status)}</td>
+        <td>
+          <div style="display:flex;gap:6px">
+            <button class="btn-sm btn-sm-info"   onclick="viewDetail(${p.id})"    title="Detail"><i class="fas fa-eye"></i></button>
+            <button class="btn-sm btn-sm-pink"   onclick="openEditModal(${p.id})" title="Edit"><i class="fas fa-edit"></i></button>
+            <button class="btn-sm btn-sm-danger" onclick="deleteProduct(${p.id})" title="Hapus"><i class="fas fa-trash"></i></button>
+          </div>
+        </td>
+      </tr>
+    `).join('') || `<tr><td colspan="7" style="text-align:center;padding:40px;color:#aaa">Tidak ada produk ditemukan</td></tr>`;
+
+    renderPagination(total);
+  }
+
+  function renderPagination(total) {
+    const pages = Math.ceil(total / PER_PAGE);
+    const el    = document.getElementById('pagination');
+    if (pages <= 1) { el.innerHTML = ''; return; }
+    let html = `<button class="page-btn" onclick="goPage(${currentPage-1})" ${currentPage===1?'disabled':''}>‹</button>`;
+    for (let i = 1; i <= pages; i++)
+      html += `<button class="page-btn ${i===currentPage?'active':''}" onclick="goPage(${i})">${i}</button>`;
+    html += `<button class="page-btn" onclick="goPage(${currentPage+1})" ${currentPage===pages?'disabled':''}>›</button>`;
+    el.innerHTML = html;
+  }
+
+  function goPage(p) {
+    const pages = Math.ceil(getFiltered().length / PER_PAGE);
+    if (p < 1 || p > pages) return;
+    currentPage = p;
+    renderTable();
+  }
+
+  function toggleAll(cb) {
+    document.querySelectorAll('.row-check').forEach(c => c.checked = cb.checked);
+  }
+
+  function openAddModal() {
+    editingId = null;
+    document.getElementById('modalTitle').textContent = 'Tambah Produk Baru';
+    document.getElementById('pName').value     = '';
+    document.getElementById('pPrice').value    = '';
+    document.getElementById('pStock').value    = '';
+    document.getElementById('pDesc').value     = '';
+    document.getElementById('pCategory').value = 'Glamour';
+    document.getElementById('pStatus').value   = 'Aktif';
+    document.getElementById('pImagePreview').style.display = 'none';
+    openModal('productModal');
+  }
+
+  function openEditModal(id) {
+    const p = localProducts.find(x => x.id === id);
+    if (!p) return;
+    editingId = id;
+    document.getElementById('modalTitle').textContent = 'Edit Produk';
+    document.getElementById('pName').value     = p.name;
+    document.getElementById('pPrice').value    = p.price;
+    document.getElementById('pStock').value    = p.stock;
+    document.getElementById('pDesc').value     = p.description || '';
+    document.getElementById('pCategory').value = p.category;
+    document.getElementById('pStatus').value   = p.status;
+    const prev = document.getElementById('pImagePreview');
+    prev.src = p.image; prev.style.display = 'block';
+    openModal('productModal');
+  }
+
+  async function saveProduct() {
+    const name  = document.getElementById('pName').value.trim();
+    const price = parseInt(document.getElementById('pPrice').value);
+    const stock = parseInt(document.getElementById('pStock').value);
+    if (!name || !price) { showToast('Nama dan harga wajib diisi!', 'error'); return; }
+
+    const formData = new FormData();
+    formData.append('name',        name);
+    formData.append('price',       price);
+    formData.append('stock',       stock || 0);
+    formData.append('category',    document.getElementById('pCategory').value);
+    formData.append('status',      document.getElementById('pStatus').value);
+    formData.append('description', document.getElementById('pDesc').value);
+
+    const imgFile = document.getElementById('pImageFile').files[0];
+    if (imgFile) formData.append('image', imgFile);
+
+    const ok = await saveProductToAPI(formData, editingId);
+    if (ok) closeModal('productModal');
+  }
+
+  function deleteProduct(id) {
+    const p = localProducts.find(x => x.id === id);
+    if (!p) return;
+    confirmDelete(`Hapus produk "${p.name}"? Tindakan ini tidak bisa dibatalkan.`, () => {
+      deleteProductFromAPI(id);
+    });
+  }
+
+  function viewDetail(id) {
+    const p = localProducts.find(x => x.id === id);
+    if (!p) return;
+    document.getElementById('detailModalBody').innerHTML = `
+      <div style="display:flex;gap:20px;align-items:flex-start">
+        <img src="${p.image}" style="width:120px;height:120px;object-fit:cover;border-radius:14px;border:1px solid #f0d0dc;flex-shrink:0" onerror="this.src='../images/nail-1.jpeg'" />
+        <div style="flex:1">
+          <h2 style="font-size:1.1rem;font-weight:700;margin-bottom:6px">${p.name}</h2>
+          <p style="font-size:0.82rem;color:#888;margin-bottom:12px">ID: #${p.id} · ${p.category}</p>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px">
+            <div style="background:#fdf0f5;border-radius:10px;padding:12px">
+              <p style="font-size:0.72rem;color:#888">Harga</p>
+              <p style="font-size:1rem;font-weight:700;color:#e91e8c">${formatRp(p.price)}</p>
+            </div>
+            <div style="background:#fdf0f5;border-radius:10px;padding:12px">
+              <p style="font-size:0.72rem;color:#888">Stok</p>
+              <p style="font-size:1rem;font-weight:700;color:${p.stock===0?'#f44336':'#4caf50'}">${p.stock} pcs</p>
+            </div>
+          </div>
+          <p style="font-size:0.82rem;color:#555;line-height:1.6">${p.description || '-'}</p>
+          <div style="margin-top:12px">${statusBadge(p.status)}</div>
+        </div>
+      </div>
+    `;
+    openModal('detailModal');
+  }
+
+  function previewImage(input) {
+    if (input.files && input.files[0]) {
+      const reader = new FileReader();
+      reader.onload = e => {
+        const prev = document.getElementById('pImagePreview');
+        prev.src = e.target.result;
+        prev.style.display = 'block';
+      };
+      reader.readAsDataURL(input.files[0]);
+    }
+  }
+
+  function exportCSV() {
+    const rows = [['ID','Nama','Kategori','Harga','Stok','Status']];
+    localProducts.forEach(p => rows.push([p.id, p.name, p.category, p.price, p.stock, p.status]));
+    const csv = rows.map(r => r.join(',')).join('\n');
+    const a   = document.createElement('a');
+    a.href    = 'data:text/csv;charset=utf-8,' + encodeURIComponent(csv);
+    a.download = 'produk-cnailist.csv';
+    a.click();
+    showToast('Data berhasil diexport!', 'success');
+  }
+
+  document.addEventListener('DOMContentLoaded', () => {
+    setAdminUIInfo();
+    loadProducts();
+  });
+</script>
+</body>
+</html>

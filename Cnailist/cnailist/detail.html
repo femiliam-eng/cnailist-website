@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Detail Produk - Cnailist</title>
+  <link rel="stylesheet" href="css/style.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="preconnect" href="https://cdnjs.cloudflare.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+</head>
+<body>
+
+  <!-- NAVBAR -->
+  <nav class="navbar">
+    <a href="index.html" class="navbar-brand" id="navBrand">Cnailist</a>
+    <ul class="navbar-nav">
+      <li><a href="index.html">Beranda</a></li>
+      <li><a href="collection.html">Produk</a></li>
+      <li><a href="custom.html">Custom Order</a></li>
+      <li><a href="index.html#tentang">Tentang Kami</a></li>
+      <li><a href="index.html#kontak">Kontak</a></li>
+    </ul>
+    <div class="navbar-right">
+      <i class="fas fa-search search-icon"></i>
+      <a href="cart.html" class="cart-wrapper">
+        <i class="fas fa-shopping-bag cart-icon"></i>
+        <span class="cart-badge" style="display:none">0</span>
+      </a>
+      <button class="btn-login btn-nav-auth" onclick="window.location.href='tracking.html'">
+        <i class="fas fa-search" style="margin-right:5px;font-size:0.8rem"></i>Cek Pesanan
+      </button>
+    </div>
+  </nav>
+
+  <!-- PAGE HEADER -->
+  <div class="page-header" id="breadcrumb">
+    <a href="index.html">Beranda</a> &rsaquo; <a href="collection.html">Produk</a> &rsaquo; <span id="breadcrumbName">Detail</span>
+  </div>
+
+  <!-- DETAIL LAYOUT -->
+  <div class="detail-layout">
+
+    <!-- IMAGES -->
+    <div class="detail-images">
+      <img id="mainImage" class="detail-main-img" src="" alt="Produk" />
+      <div class="detail-thumbnails">
+        <button class="thumb-arrow" onclick="scrollThumbs(-1)">&#8249;</button>
+        <div class="thumb-list" id="thumbList"></div>
+        <button class="thumb-arrow" onclick="scrollThumbs(1)">&#8250;</button>
+      </div>
+    </div>
+
+    <!-- INFO -->
+    <div class="detail-info">
+      <h1 id="productName">-</h1>
+      <p class="detail-price" id="productPrice">-</p>
+      <p class="detail-stock">Stok: <span id="productStock">-</span></p>
+
+      <p class="qty-label">Jumlah</p>
+      <div class="qty-control">
+        <button class="qty-btn" onclick="changeQty(-1)">&#8722;</button>
+        <input type="number" class="qty-input" id="qtyInput" value="1" min="1" max="99" />
+        <button class="qty-btn" onclick="changeQty(1)">&#43;</button>
+      </div>
+
+      <div class="detail-actions">
+        <button class="btn-outline" onclick="handleAddToCart()">
+          <i class="fas fa-shopping-bag"></i> Tambah ke Keranjang
+        </button>
+        <button class="btn-primary" onclick="handleBuyNow()">
+          Beli Sekarang
+        </button>
+      </div>
+
+      <div class="detail-desc">
+        <h3>Deskripsi Produk</h3>
+        <p id="productDesc">-</p>
+      </div>
+
+      <!-- RELATED PRODUCTS -->
+      <div style="margin-top:36px">
+        <h3 style="font-size:1rem;font-weight:700;margin-bottom:16px">Produk Lainnya</h3>
+        <div style="display:flex;gap:14px;overflow-x:auto;padding-bottom:8px" id="relatedProducts"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <h3>Cnailist</h3>
+        <p>Toko kuku palsu terpercaya dengan koleksi terlengkap dan berkualitas tinggi.</p>
+      </div>
+      <div class="footer-col">
+        <h4>Tentang Kami</h4>
+        <ul><li>Tentang Cnailist</li><li>Tim Kami</li><li>Blog</li></ul>
+      </div>
+      <div class="footer-col">
+        <h4>Layanan</h4>
+        <ul><li>FAQ</li><li>Kebijakan Pengembalian</li><li>Panduan Ukuran</li></ul>
+      </div>
+      <div class="footer-col">
+        <h4>Kontak</h4>
+        <ul><li>hello@cnailist.id</li><li>@cnailist</li></ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>&copy; 2026 Cnailist. All rights reserved.</p>
+    </div>
+  </footer>
+
+  <div class="toast" id="toast"></div>
+
+  <script src="js/app.js"></script>
+  <script src="js/api.js"></script>
+  <script src="js/chat.js"></script>
+
+  <script>
+    let currentProduct = null;
+
+    async function loadProduct() {
+      const id = parseInt(localStorage.getItem('fnb_selected_product') || '1');
+
+      // Skeleton loading
+      document.getElementById('productName').textContent  = 'Memuat...';
+      document.getElementById('productPrice').textContent = '';
+      document.getElementById('productStock').textContent = '';
+      document.getElementById('productDesc').textContent  = '';
+
+      // Load dari API (dengan fallback ke data statis)
+      currentProduct = await loadProductByIdFromAPI(id);
+
+      // Pastikan products array juga terisi untuk "produk lainnya"
+      if (products.length === 0) await loadProductsFromAPI();
+
+      renderProduct();
+    }
+
+    function renderProduct() {
+      const p = currentProduct;
+      if (!p) return;
+
+      document.getElementById('navBrand').textContent       = 'Cnailist';
+      document.getElementById('breadcrumbName').textContent = p.name;
+      document.title = p.name + ' - Cnailist';
+
+      // Main image
+      const mainImg = document.getElementById('mainImage');
+      mainImg.src = p.images[0] || p.image;
+      mainImg.alt = p.name;
+      mainImg.onerror = () => { mainImg.src = 'images/nail-1.jpeg'; };
+
+      // Thumbnails
+      const thumbList = document.getElementById('thumbList');
+      thumbList.innerHTML = p.images.map((img, i) => `
+        <img src="${img}" alt="thumb ${i+1}"
+          class="${i === 0 ? 'active' : ''}"
+          onclick="setMainImage('${img}', this)"
+          onerror="this.src='images/nail-1.jpeg'" />
+      `).join('');
+
+      // Info
+      document.getElementById('productName').textContent  = p.name;
+      document.getElementById('productPrice').textContent = formatPrice(p.price);
+
+      const stockEl = document.getElementById('productStock');
+      if (p.stock === 0 || p.status === 'Habis') {
+        stockEl.textContent = 'Habis';
+        stockEl.style.color = '#f44336';
+        // Disable tombol beli
+        document.querySelector('.detail-actions .btn-primary').disabled = true;
+        document.querySelector('.detail-actions .btn-outline').disabled = true;
+      } else {
+        stockEl.textContent = p.stock + ' tersisa';
+        stockEl.style.color = p.stock < 5 ? '#ff9800' : '#4caf50';
+      }
+
+      document.getElementById('productDesc').textContent = p.description;
+
+      // Related products — cari dari array products, exclude yang sedang ditampilkan
+      const related = products.filter(rp => rp.id !== p.id).slice(0, 4);
+      document.getElementById('relatedProducts').innerHTML = related.map(rp => `
+        <div onclick="goTo('detail.html', ${rp.id})"
+          style="flex-shrink:0;width:120px;cursor:pointer;border:1px solid #f0d0dc;border-radius:10px;overflow:hidden;transition:box-shadow 0.2s"
+          onmouseover="this.style.boxShadow='0 4px 12px rgba(233,30,140,0.15)'"
+          onmouseout="this.style.boxShadow='none'">
+          <img src="${rp.image}" alt="${rp.name}" style="width:100%;height:90px;object-fit:cover"
+            onerror="this.src='images/nail-1.jpeg'" />
+          <div style="padding:8px">
+            <p style="font-size:0.75rem;font-weight:600;margin-bottom:2px">${rp.name}</p>
+            <p style="font-size:0.72rem;color:#e91e8c;font-weight:700">${formatPrice(rp.price)}</p>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function setMainImage(src, el) {
+      const mainImg = document.getElementById('mainImage');
+      mainImg.src = src;
+      mainImg.onerror = () => { mainImg.src = 'images/nail-1.jpeg'; };
+      document.querySelectorAll('.thumb-list img').forEach(img => img.classList.remove('active'));
+      el.classList.add('active');
+    }
+
+    function scrollThumbs(dir) {
+      document.getElementById('thumbList').scrollBy({ left: dir * 90, behavior: 'smooth' });
+    }
+
+    function changeQty(delta) {
+      const input = document.getElementById('qtyInput');
+      let val = parseInt(input.value) + delta;
+      if (val < 1) val = 1;
+      if (val > 99) val = 99;
+      input.value = val;
+    }
+
+    function handleAddToCart() {
+      if (!currentProduct) return;
+      const qty = parseInt(document.getElementById('qtyInput').value);
+      addToCart(currentProduct.id, qty);
+    }
+
+    function handleBuyNow() {
+      if (!currentProduct) return;
+      const qty = parseInt(document.getElementById('qtyInput').value);
+      addToCart(currentProduct.id, qty);
+      window.location.href = 'cart.html';
+    }
+
+    document.addEventListener('DOMContentLoaded', loadProduct);
+  </script>
+</body>
+</html>

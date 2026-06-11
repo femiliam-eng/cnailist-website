@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dashboard - Cnailist Admin</title>
+  <link rel="stylesheet" href="css/admin.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="preconnect" href="https://cdnjs.cloudflare.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+</head>
+<body>
+<div class="admin-wrapper">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar" id="adminSidebar">
+    <div class="sidebar-brand">
+      <div class="brand-icon">💅</div>
+      <div>
+        <div class="brand-text">Cnailist</div>
+        <div class="brand-sub">Admin Panel</div>
+      </div>
+    </div>
+
+    <nav class="sidebar-nav">
+      <div class="nav-section-label">Menu Utama</div>
+      <a href="index.html" class="nav-item active">
+        <i class="fas fa-chart-pie nav-icon"></i>
+        <span class="nav-label">Dashboard</span>
+      </a>
+      <a href="products.html" class="nav-item">
+        <i class="fas fa-box nav-icon"></i>
+        <span class="nav-label">Produk</span>
+      </a>
+      <a href="orders.html" class="nav-item">
+        <i class="fas fa-shopping-bag nav-icon"></i>
+        <span class="nav-label">Pesanan</span>
+      </a>
+      <a href="customers.html" class="nav-item">
+        <i class="fas fa-users nav-icon"></i>
+        <span class="nav-label">Pelanggan</span>
+      </a>
+
+      <a href="login.html" onclick="event.preventDefault();adminLogout()" class="nav-item">
+        <i class="fas fa-sign-out-alt nav-icon"></i>
+        <span class="nav-label">Keluar</span>
+      </a>
+    </nav>
+
+    <div class="sidebar-footer">
+      <div class="admin-profile">
+        <div class="admin-avatar">A</div>
+        <div>
+          <div class="admin-name">Admin</div>
+          <div class="admin-role">Super Admin</div>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <div class="main-content" id="mainContent">
+
+    <!-- TOPBAR -->
+    <header class="topbar">
+      <div class="topbar-left">
+        <button class="toggle-btn" onclick="toggleSidebar()"><i class="fas fa-bars"></i></button>
+        <span class="page-title">Dashboard</span>
+      </div>
+      <div class="topbar-right">
+        <div class="topbar-search">
+          <i class="fas fa-search"></i>
+          <input type="text" placeholder="Cari..." />
+        </div>
+        <button class="topbar-icon-btn">
+          <i class="fas fa-bell"></i>
+          <span class="topbar-notif-badge"></span>
+        </button>
+        <button class="topbar-icon-btn" onclick="window.open('../index.html','_blank')">
+          <i class="fas fa-external-link-alt"></i>
+        </button>
+      </div>
+    </header>
+
+    <!-- PAGE CONTENT -->
+    <div class="page-content">
+
+      <!-- GREETING -->
+      <div style="margin-bottom:24px">
+        <h2 style="font-size:1.3rem;font-weight:700">Selamat datang, Admin! 👋</h2>
+        <p style="font-size:0.85rem;color:#888">Berikut ringkasan toko Cnailist hari ini.</p>
+      </div>
+
+      <!-- STAT CARDS -->
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-icon pink"><i class="fas fa-shopping-bag" style="color:#e91e8c"></i></div>
+          <div class="stat-info">
+            <h3 id="statTotalOrders">0</h3>
+            <p>Total Pesanan</p>
+          </div>
+          <span class="stat-change up" id="statOrderChange">-</span>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon green"><i class="fas fa-money-bill-wave" style="color:#4caf50"></i></div>
+          <div class="stat-info">
+            <h3 id="statRevenue">Rp 0</h3>
+            <p>Total Pendapatan</p>
+          </div>
+          <span class="stat-change up" id="statRevenueChange">-</span>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon blue"><i class="fas fa-box" style="color:#2196f3"></i></div>
+          <div class="stat-info">
+            <h3 id="statTotalProducts">0</h3>
+            <p>Total Produk</p>
+          </div>
+          <span class="stat-change up">Aktif</span>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon orange"><i class="fas fa-users" style="color:#ff9800"></i></div>
+          <div class="stat-info">
+            <h3 id="statPending">0</h3>
+            <p>Pesanan Pending</p>
+          </div>
+          <span class="stat-change" id="statPendingBadge" style="background:#fff3e0;color:#ff9800">Menunggu</span>
+        </div>
+      </div>
+
+      <!-- CHART + RECENT ORDERS -->
+      <div class="grid-2" style="margin-bottom:20px">
+
+        <!-- CHART -->
+        <div class="card">
+          <div class="card-header">
+            <h3><i class="fas fa-chart-bar" style="color:#e91e8c;margin-right:8px"></i>Penjualan 7 Hari Terakhir</h3>
+            <span style="font-size:0.78rem;color:#888">Mei 2026</span>
+          </div>
+          <div class="card-body">
+            <div class="chart-area" id="salesChart"></div>
+          </div>
+        </div>
+
+        <!-- ORDER STATUS PIE -->
+        <div class="card">
+          <div class="card-header">
+            <h3><i class="fas fa-circle-notch" style="color:#e91e8c;margin-right:8px"></i>Status Pesanan</h3>
+          </div>
+          <div class="card-body">
+            <div style="display:flex;flex-direction:column;gap:14px" id="orderStatusList"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- RECENT ORDERS + TOP PRODUCTS -->
+      <div class="grid-2">
+
+        <!-- RECENT ORDERS -->
+        <div class="card">
+          <div class="card-header">
+            <h3><i class="fas fa-clock" style="color:#e91e8c;margin-right:8px"></i>Pesanan Terbaru</h3>
+            <a href="orders.html" style="font-size:0.8rem;color:#e91e8c;font-weight:600">Lihat Semua</a>
+          </div>
+          <div style="overflow-x:auto">
+            <table class="admin-table" id="recentOrdersTable"></table>
+          </div>
+        </div>
+
+        <!-- TOP PRODUCTS -->
+        <div class="card">
+          <div class="card-header">
+            <h3><i class="fas fa-star" style="color:#e91e8c;margin-right:8px"></i>Produk Terlaris</h3>
+            <a href="products.html" style="font-size:0.8rem;color:#e91e8c;font-weight:600">Lihat Semua</a>
+          </div>
+          <div class="card-body" id="topProductsList"></div>
+        </div>
+      </div>
+
+    </div><!-- end page-content -->
+  </div><!-- end main-content -->
+</div>
+
+<div class="toast" id="adminToast"></div>
+
+<script src="js/admin.js"></script>
+<script src="../js/api.js"></script>
+<script src="js/notif.js"></script>
+<script>
+  // Auth check
+  document.addEventListener('DOMContentLoaded', () => {
+    if (!isAdminLoggedIn()) { window.location.href = 'login.html'; return; }
+    setAdminUIInfo();
+    loadDashboard();
+  });
+
+  // ===== LOAD DARI API =====
+  async function loadDashboard() {
+    try {
+      const statsRes  = await orderAPI.getStats();
+      const stats     = statsRes.data;
+
+      document.getElementById('statTotalOrders').textContent   = stats.total_orders;
+      document.getElementById('statRevenue').textContent       = formatRp(stats.total_revenue);
+      document.getElementById('statTotalProducts').textContent = stats.total_products;
+      document.getElementById('statPending').textContent       = stats.pending_orders;
+      document.getElementById('statPendingBadge').textContent  =
+        stats.pending_orders > 0 ? `${stats.pending_orders} menunggu` : 'Tidak ada';
+      document.getElementById('statOrderChange').textContent   = '-';
+
+      renderWeeklyChart(stats.weekly || []);
+
+      const ordersRes = await orderAPI.getAll();
+      renderRecentOrdersFromAPI(ordersRes.data || []);
+      renderStatusChartFromAPI(ordersRes.data || []);
+
+      const prodRes = await productAPI.getAll();
+      renderTopProductsFromAPI(ordersRes.data || [], prodRes.data || []);
+
+    } catch (e) {
+      // Tampilkan error, semua card tetap 0
+      showToast('Gagal memuat data dashboard. Cek koneksi ke server.', 'error');
+    }
+  }
+
+  function renderWeeklyChart(weekly) {
+    const chartEl = document.getElementById('salesChart');
+    const days = ['Min','Sen','Sel','Rab','Kam','Jum','Sab'];
+    const data = [];
+
+    // Siapkan 7 hari terakhir
+    for (let i = 6; i >= 0; i--) {
+      const d       = new Date(Date.now() - i * 86400000);
+      const dateStr = d.toISOString().slice(0, 10);
+      const found   = weekly.find(w => w.date === dateStr);
+      data.push({
+        day:    days[d.getDay()],
+        val:    found ? parseInt(found.orders) : 0,
+        amount: found ? parseInt(found.revenue) : 0,
+      });
+    }
+
+    const maxVal = Math.max(...data.map(d => d.val), 1);
+    chartEl.innerHTML = data.map(d => {
+      const pct = Math.round((d.val / maxVal) * 100);
+      return `
+        <div class="chart-bar-wrap" title="${d.day}: ${d.val} pesanan · ${formatRp(d.amount)}">
+          <div class="chart-value">${d.val}</div>
+          <div class="chart-bar" style="height:${Math.max(pct, 4)}%"></div>
+          <div class="chart-label">${d.day}</div>
+        </div>
+      `;
+    }).join('');
+
+    const now = new Date();
+    document.querySelector('.card-header span[style*="color:#888"]').textContent =
+      now.toLocaleDateString('id-ID', { month: 'long', year: 'numeric' });
+  }
+
+  function renderRecentOrdersFromAPI(orders) {
+    const table = document.getElementById('recentOrdersTable');
+    if (orders.length === 0) {
+      table.innerHTML = `<tbody><tr><td colspan="4" style="text-align:center;padding:30px;color:#bbb">Belum ada pesanan masuk</td></tr></tbody>`;
+      return;
+    }
+    table.innerHTML = `
+      <thead><tr><th>ID</th><th>Pelanggan</th><th>Total</th><th>Status</th></tr></thead>
+      <tbody>
+        ${orders.slice(0, 5).map(o => `
+          <tr>
+            <td style="font-weight:600;color:#e91e8c">${o.id}</td>
+            <td>
+              <div style="font-weight:600;font-size:0.85rem">${o.customer_name}</div>
+              <div style="font-size:0.75rem;color:#aaa">${o.customer_phone}</div>
+            </td>
+            <td style="font-weight:700">${formatRp(o.total)}</td>
+            <td>${statusBadge(o.status || 'Pending')}</td>
+          </tr>
+        `).join('')}
+      </tbody>
+    `;
+  }
+
+  function renderStatusChartFromAPI(orders) {
+    const statusEl = document.getElementById('orderStatusList');
+    const statusColors = {
+      'Selesai':'#4caf50','Dikirim':'#2196f3',
+      'Diproses':'#ff9800','Pending':'#e91e8c','Dibatalkan':'#f44336',
+    };
+
+    if (orders.length === 0) {
+      statusEl.innerHTML = `<div style="text-align:center;padding:20px;color:#bbb;font-size:0.85rem">Belum ada pesanan</div>`;
+      return;
+    }
+
+    const statusCount = {};
+    orders.forEach(o => { statusCount[o.status] = (statusCount[o.status] || 0) + 1; });
+
+    statusEl.innerHTML = Object.entries(statusCount).map(([s, c]) => {
+      const pct = Math.round((c / orders.length) * 100);
+      return `
+        <div>
+          <div style="display:flex;justify-content:space-between;font-size:0.82rem;margin-bottom:5px">
+            <span style="font-weight:600">${s}</span>
+            <span style="color:#888">${c} pesanan (${pct}%)</span>
+          </div>
+          <div style="background:#f5f5f5;border-radius:6px;height:8px;overflow:hidden">
+            <div style="height:100%;width:${pct}%;background:${statusColors[s]||'#ccc'};border-radius:6px;transition:width 1s"></div>
+          </div>
+        </div>
+      `;
+    }).join('');
+  }
+
+  function renderTopProductsFromAPI(orders, products) {
+    const topEl  = document.getElementById('topProductsList');
+    const soldMap = {};
+    orders.filter(o => o.status !== 'Dibatalkan').forEach(o => {
+      (o.items || []).forEach(item => {
+        if (!soldMap[item.name]) soldMap[item.name] = { ...item, sold: 0 };
+        soldMap[item.name].sold += item.qty || 1;
+      });
+    });
+
+    let topList = Object.values(soldMap).sort((a, b) => b.sold - a.sold).slice(0, 5);
+    if (topList.length === 0) topList = products.slice(0, 5).map(p => ({ ...p, sold: 0 }));
+
+    topEl.innerHTML = topList.map((p, i) => {
+      // Gunakan productAPI.imageUrl() kalau tersedia, fallback ke static
+      const imgSrc = (typeof productAPI !== 'undefined' && productAPI.imageUrl)
+        ? productAPI.imageUrl(p)
+        : (p.image || '../images/nail-1.jpeg');
+      return `
+        <div style="display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:${i < topList.length-1 ? '1px solid #f5f5f5' : 'none'}">
+          <span style="font-size:0.8rem;font-weight:800;color:#e91e8c;width:18px">${i+1}</span>
+          <img src="${imgSrc}" style="width:40px;height:40px;object-fit:cover;border-radius:8px;border:1px solid #f0d0dc" onerror="this.src='../images/nail-1.jpeg'" />
+          <div style="flex:1">
+            <p style="font-size:0.85rem;font-weight:600">${p.name}</p>
+            <p style="font-size:0.75rem;color:#888">${p.sold > 0 ? 'Terjual: ' + p.sold + ' pcs' : (p.category || '-')}</p>
+          </div>
+          <span style="font-size:0.82rem;font-weight:700;color:#e91e8c">${formatRp(p.price)}</span>
+        </div>
+      `;
+    }).join('');
+  }
+
+</script>
+</body>
+</html>

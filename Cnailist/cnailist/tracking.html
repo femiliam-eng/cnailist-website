@@ -1,0 +1,682 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Cek Pesanan - Cnailist</title>
+  <meta name="description" content="Cek status pesanan kamu di Cnailist menggunakan nomor HP atau ID pesanan." />
+  <link rel="stylesheet" href="css/style.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="preconnect" href="https://cdnjs.cloudflare.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+  <style>
+    :root {
+      --pink: #e91e8c;
+      --pink-pale: #fce4ec;
+      --pink-soft: #fdf0f5;
+      --pink-dark: #c2185b;
+    }
+
+    /* HERO */
+    .tracking-hero {
+      background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+      padding: 60px 20px 80px;
+      text-align: center;
+      color: #fff;
+    }
+
+    .tracking-hero h1 {
+      font-size: 2rem;
+      font-weight: 800;
+      margin-bottom: 10px;
+    }
+
+    .tracking-hero p {
+      font-size: 0.95rem;
+      color: rgba(255,255,255,0.65);
+      margin-bottom: 36px;
+    }
+
+    /* SEARCH CARD */
+    .tracking-wrap {
+      max-width: 600px;
+      margin: -44px auto 40px;
+      padding: 0 20px;
+    }
+
+    .search-card {
+      background: #fff;
+      border-radius: 20px;
+      box-shadow: 0 12px 48px rgba(233,30,140,0.12);
+      padding: 36px 32px;
+      border: 1.5px solid var(--pink-pale);
+    }
+
+    .search-tabs {
+      display: flex;
+      gap: 0;
+      background: var(--pink-soft);
+      border-radius: 12px;
+      padding: 4px;
+      margin-bottom: 24px;
+    }
+
+    .search-tab {
+      flex: 1;
+      padding: 10px;
+      border: none;
+      background: transparent;
+      border-radius: 10px;
+      font-family: inherit;
+      font-size: 0.85rem;
+      font-weight: 600;
+      cursor: pointer;
+      color: #888;
+      transition: all 0.2s;
+    }
+
+    .search-tab.active {
+      background: #fff;
+      color: var(--pink);
+      box-shadow: 0 2px 8px rgba(233,30,140,0.12);
+    }
+
+    .input-group {
+      position: relative;
+      margin-bottom: 16px;
+    }
+
+    .input-group i {
+      position: absolute;
+      left: 16px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: #ccc;
+      font-size: 0.95rem;
+    }
+
+    .input-group input {
+      width: 100%;
+      padding: 14px 16px 14px 46px;
+      border: 1.5px solid #f0d0dc;
+      border-radius: 12px;
+      font-size: 0.92rem;
+      font-family: inherit;
+      outline: none;
+      transition: border-color 0.2s;
+      box-sizing: border-box;
+    }
+
+    .input-group input:focus {
+      border-color: var(--pink);
+    }
+
+    .btn-track {
+      width: 100%;
+      padding: 14px;
+      background: var(--pink);
+      color: #fff;
+      border: none;
+      border-radius: 12px;
+      font-size: 0.95rem;
+      font-weight: 700;
+      cursor: pointer;
+      font-family: inherit;
+      transition: background 0.2s, transform 0.1s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    .btn-track:hover { background: var(--pink-dark); transform: translateY(-1px); }
+    .btn-track:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+
+    .error-box {
+      background: #ffebee;
+      color: #c62828;
+      border-radius: 10px;
+      padding: 12px 16px;
+      font-size: 0.85rem;
+      margin-top: 14px;
+      display: none;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .error-box.show { display: flex; }
+
+    /* RESULTS */
+    .results-wrap {
+      max-width: 680px;
+      margin: 0 auto 60px;
+      padding: 0 20px;
+    }
+
+    .results-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 20px;
+    }
+
+    .results-header h2 {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: #222;
+    }
+
+    .results-header span {
+      font-size: 0.82rem;
+      color: #aaa;
+    }
+
+    /* ORDER CARD */
+    .order-card {
+      background: #fff;
+      border-radius: 16px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.06);
+      border: 1.5px solid #f0d0dc;
+      margin-bottom: 16px;
+      overflow: hidden;
+      transition: box-shadow 0.2s;
+    }
+
+    .order-card:hover { box-shadow: 0 8px 32px rgba(233,30,140,0.12); }
+
+    .order-card-header {
+      background: var(--pink-soft);
+      padding: 14px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid #f0d0dc;
+    }
+
+    .order-id {
+      font-weight: 800;
+      color: var(--pink);
+      font-size: 0.92rem;
+    }
+
+    .order-date {
+      font-size: 0.78rem;
+      color: #aaa;
+    }
+
+    /* STATUS STEPPER */
+    .status-stepper {
+      padding: 20px 20px 10px;
+    }
+
+    .stepper-track {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: relative;
+      margin-bottom: 8px;
+    }
+
+    .stepper-track::before {
+      content: '';
+      position: absolute;
+      top: 16px;
+      left: 16px;
+      right: 16px;
+      height: 3px;
+      background: #f0d0dc;
+      z-index: 0;
+    }
+
+    .stepper-track.progress-1::before { background: linear-gradient(to right, var(--pink) 0%, var(--pink) 0%, #f0d0dc 0%); }
+    .stepper-track.progress-2::before { background: linear-gradient(to right, var(--pink) 0%, var(--pink) 33%, #f0d0dc 33%); }
+    .stepper-track.progress-3::before { background: linear-gradient(to right, var(--pink) 0%, var(--pink) 66%, #f0d0dc 66%); }
+    .stepper-track.progress-4::before { background: var(--pink); }
+    .stepper-track.progress-cancel::before { background: #f5f5f5; }
+
+    .step-dot {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: #f0d0dc;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.85rem;
+      z-index: 1;
+      color: #ccc;
+      flex-shrink: 0;
+      transition: all 0.3s;
+    }
+
+    .step-dot.done {
+      background: var(--pink);
+      color: #fff;
+    }
+
+    .step-dot.current {
+      background: var(--pink);
+      color: #fff;
+      box-shadow: 0 0 0 4px rgba(233,30,140,0.2);
+      animation: pulse-dot 1.5s ease-in-out infinite;
+    }
+
+    .step-dot.cancelled {
+      background: #bbb;
+      color: #fff;
+    }
+
+    @keyframes pulse-dot {
+      0%, 100% { box-shadow: 0 0 0 4px rgba(233,30,140,0.2); }
+      50% { box-shadow: 0 0 0 8px rgba(233,30,140,0.1); }
+    }
+
+    .stepper-labels {
+      display: flex;
+      justify-content: space-between;
+      padding: 0 4px;
+    }
+
+    .stepper-label {
+      font-size: 0.7rem;
+      color: #aaa;
+      text-align: center;
+      width: 60px;
+      line-height: 1.3;
+    }
+
+    .stepper-label.active {
+      color: var(--pink);
+      font-weight: 600;
+    }
+
+    /* ORDER BODY */
+    .order-body {
+      padding: 16px 20px 20px;
+    }
+
+    .order-info-row {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.83rem;
+      margin-bottom: 8px;
+      color: #555;
+    }
+
+    .order-info-row strong {
+      color: #333;
+      font-weight: 600;
+    }
+
+    .order-items-list {
+      background: var(--pink-soft);
+      border-radius: 10px;
+      padding: 12px 14px;
+      margin: 12px 0;
+    }
+
+    .order-item-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.82rem;
+      padding: 4px 0;
+      border-bottom: 1px dashed #f0d0dc;
+    }
+
+    .order-item-row:last-child { border-bottom: none; }
+
+    .order-item-row .item-name {
+      font-weight: 600;
+      color: #333;
+    }
+
+    .order-item-row .item-qty {
+      color: #888;
+      font-size: 0.78rem;
+    }
+
+    .order-item-row .item-price {
+      color: var(--pink);
+      font-weight: 700;
+    }
+
+    .order-total-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 10px;
+      padding-top: 10px;
+      border-top: 1.5px solid #f0d0dc;
+    }
+
+    .order-total-row .label {
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: #555;
+    }
+
+    .order-total-row .total {
+      font-size: 1rem;
+      font-weight: 800;
+      color: var(--pink);
+    }
+
+    /* STATUS BADGE */
+    .badge-status {
+      display: inline-block;
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 0.75rem;
+      font-weight: 700;
+    }
+
+    .badge-Pending    { background: #fce4ec; color: var(--pink); }
+    .badge-Diproses   { background: #fff8e1; color: #f57f17; }
+    .badge-Dikirim    { background: #e3f2fd; color: #1565c0; }
+    .badge-Selesai    { background: #e8f5e9; color: #2e7d32; }
+    .badge-Dibatalkan { background: #f5f5f5; color: #757575; }
+
+    /* EMPTY STATE */
+    .empty-state {
+      text-align: center;
+      padding: 60px 20px;
+      color: #aaa;
+    }
+
+    .empty-state .emoji {
+      font-size: 3.5rem;
+      margin-bottom: 16px;
+    }
+
+    .empty-state h3 {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: #555;
+      margin-bottom: 8px;
+    }
+
+    .empty-state p {
+      font-size: 0.88rem;
+      margin-bottom: 24px;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- NAVBAR -->
+  <nav class="navbar">
+    <a href="index.html" class="navbar-brand">Cnailist</a>
+    <ul class="navbar-nav">
+      <li><a href="index.html">Beranda</a></li>
+      <li><a href="collection.html">Produk</a></li>
+      <li><a href="custom.html">Custom Order</a></li>
+      <li><a href="index.html#tentang">Tentang Kami</a></li>
+      <li><a href="index.html#kontak">Kontak</a></li>
+    </ul>
+    <div class="navbar-right">
+      <a href="cart.html" class="cart-wrapper">
+        <i class="fas fa-shopping-bag cart-icon"></i>
+        <span class="cart-badge" style="display:none">0</span>
+      </a>
+      <button class="btn-login btn-nav-auth" onclick="window.location.href='tracking.html'" style="background:var(--primary,#e91e8c);color:#fff">
+        <i class="fas fa-search" style="margin-right:5px;font-size:0.8rem"></i>Cek Pesanan
+      </button>
+    </div>
+  </nav>
+
+  <!-- HERO -->
+  <section class="tracking-hero">
+    <h1>🔍 Cek Status Pesanan</h1>
+    <p>Masukkan nomor HP atau ID pesanan kamu untuk melihat status terkini</p>
+  </section>
+
+  <!-- SEARCH CARD -->
+  <div class="tracking-wrap">
+    <div class="search-card">
+      <div class="search-tabs">
+        <button class="search-tab active" id="tabPhone" onclick="switchTab('phone')">
+          <i class="fas fa-phone" style="margin-right:6px"></i>No. HP
+        </button>
+        <button class="search-tab" id="tabOrder" onclick="switchTab('order')">
+          <i class="fas fa-receipt" style="margin-right:6px"></i>ID Pesanan
+        </button>
+      </div>
+
+      <div id="phonePanel">
+        <div class="input-group">
+          <i class="fas fa-phone"></i>
+          <input type="tel" id="inputPhone" placeholder="Contoh: +628123456789"
+            onkeydown="if(event.key==='Enter') doTrack()" />
+        </div>
+        <p style="font-size:0.75rem;color:#aaa;margin-bottom:16px">Masukkan nomor HP yang dipakai saat checkout</p>
+      </div>
+
+      <div id="orderPanel" style="display:none">
+        <div class="input-group">
+          <i class="fas fa-receipt"></i>
+          <input type="text" id="inputOrderId" placeholder="Contoh: ORD-12345678"
+            onkeydown="if(event.key==='Enter') doTrack()" />
+        </div>
+        <p style="font-size:0.75rem;color:#aaa;margin-bottom:16px">ID pesanan dikirim setelah kamu berhasil checkout</p>
+      </div>
+
+      <button class="btn-track" id="trackBtn" onclick="doTrack()">
+        <i class="fas fa-search"></i>Cek Pesanan
+      </button>
+
+      <div class="error-box" id="errorBox">
+        <i class="fas fa-exclamation-circle"></i>
+        <span id="errorText"></span>
+      </div>
+    </div>
+  </div>
+
+  <!-- RESULTS -->
+  <div class="results-wrap" id="resultsWrap" style="display:none">
+    <div class="results-header">
+      <h2 id="resultsTitle">Hasil Pencarian</h2>
+      <span id="resultsCount"></span>
+    </div>
+    <div id="ordersList"></div>
+  </div>
+
+  <!-- TOAST -->
+  <div class="toast" id="toast"></div>
+
+  <script src="js/app.js"></script>
+  <script src="js/api.js"></script>
+  <script src="js/chat.js"></script>
+
+  <script>
+    const STATUS_STEPS = ['Pending', 'Diproses', 'Dikirim', 'Selesai'];
+
+    let activeTab = 'phone';
+
+    function switchTab(tab) {
+      activeTab = tab;
+      document.getElementById('tabPhone').classList.toggle('active', tab === 'phone');
+      document.getElementById('tabOrder').classList.toggle('active', tab === 'order');
+      document.getElementById('phonePanel').style.display = tab === 'phone' ? 'block' : 'none';
+      document.getElementById('orderPanel').style.display = tab === 'order' ? 'block' : 'none';
+      hideError();
+      document.getElementById('resultsWrap').style.display = 'none';
+      // Focus input
+      setTimeout(() => {
+        document.getElementById(tab === 'phone' ? 'inputPhone' : 'inputOrderId').focus();
+      }, 50);
+    }
+
+    function hideError() {
+      document.getElementById('errorBox').classList.remove('show');
+    }
+
+    function showError(msg) {
+      document.getElementById('errorText').textContent = msg;
+      document.getElementById('errorBox').classList.add('show');
+    }
+
+    async function doTrack() {
+      hideError();
+      document.getElementById('resultsWrap').style.display = 'none';
+
+      const isPhone = activeTab === 'phone';
+      const val = isPhone
+        ? document.getElementById('inputPhone').value.trim()
+        : document.getElementById('inputOrderId').value.trim().toUpperCase();
+
+      if (!val) {
+        showError(isPhone ? 'Masukkan nomor HP kamu terlebih dahulu.' : 'Masukkan ID pesanan terlebih dahulu.');
+        return;
+      }
+
+      const btn = document.getElementById('trackBtn');
+      btn.disabled = true;
+      btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Mencari...';
+
+      try {
+        const params = isPhone ? { phone: val } : { order_id: val };
+        const res = await customerAPI.track(params);
+        renderResults(res.data, isPhone ? val : null);
+      } catch (e) {
+        if (e.status === 404) {
+          showError(isPhone
+            ? 'Tidak ada pesanan dengan nomor HP tersebut. Pastikan nomor yang dimasukkan benar.'
+            : 'ID Pesanan tidak ditemukan. Pastikan ID yang dimasukkan benar (contoh: ORD-12345678).'
+          );
+        } else {
+          showError('Tidak dapat terhubung ke server. Pastikan backend sedang berjalan.');
+        }
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = '<i class="fas fa-search"></i> Cek Pesanan';
+      }
+    }
+
+    function renderResults(orders, phone) {
+      const wrap = document.getElementById('resultsWrap');
+      const list = document.getElementById('ordersList');
+
+      if (!orders || orders.length === 0) {
+        showError('Tidak ada pesanan ditemukan.');
+        return;
+      }
+
+      document.getElementById('resultsTitle').textContent = phone
+        ? `Pesanan atas nama ${orders[0].customer_name}`
+        : 'Detail Pesanan';
+      document.getElementById('resultsCount').textContent = `${orders.length} pesanan`;
+
+      list.innerHTML = orders.map(o => renderOrderCard(o)).join('');
+      wrap.style.display = 'block';
+      wrap.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+
+    function renderOrderCard(o) {
+      const isCancelled = o.status === 'Dibatalkan';
+      const stepIdx     = STATUS_STEPS.indexOf(o.status); // -1 kalau dibatalkan
+      const progressClass = isCancelled
+        ? 'progress-cancel'
+        : `progress-${stepIdx + 1}`;
+
+      const dots = STATUS_STEPS.map((s, i) => {
+        let cls = 'step-dot';
+        if (isCancelled) {
+          cls += ' cancelled';
+        } else if (i < stepIdx) {
+          cls += ' done';
+        } else if (i === stepIdx) {
+          cls += ' current';
+        }
+        const icon = i < stepIdx
+          ? '<i class="fas fa-check"></i>'
+          : (i === stepIdx && !isCancelled
+              ? '<i class="fas fa-circle" style="font-size:0.5rem"></i>'
+              : (isCancelled ? '<i class="fas fa-times"></i>' : `${i+1}`));
+        return `<div class="${cls}">${icon}</div>`;
+      }).join('');
+
+      const labels = STATUS_STEPS.map((s, i) => {
+        const isActive = !isCancelled && i === stepIdx;
+        return `<div class="stepper-label${isActive ? ' active' : ''}">${s}</div>`;
+      }).join('');
+
+      const items = Array.isArray(o.items) && o.items.length > 0
+        ? `<div class="order-items-list">
+            ${o.items.map(item => `
+              <div class="order-item-row">
+                <div>
+                  <div class="item-name">${item.name}</div>
+                  <div class="item-qty">${item.qty}x</div>
+                </div>
+                <div class="item-price">Rp ${Number(item.price * item.qty).toLocaleString('id-ID')}</div>
+              </div>
+            `).join('')}
+          </div>`
+        : '';
+
+      const totalInfo = `
+        <div class="order-info-row"><span>Subtotal</span><strong>Rp ${Number(o.subtotal).toLocaleString('id-ID')}</strong></div>
+        <div class="order-info-row"><span>Ongkir</span><strong>Rp ${Number(o.shipping_cost || 15000).toLocaleString('id-ID')}</strong></div>
+      `;
+
+      return `
+        <div class="order-card">
+          <div class="order-card-header">
+            <div>
+              <div class="order-id">${o.id}</div>
+              <div class="order-date">${formatDate(o.created_at)}</div>
+            </div>
+            <div class="badge-status badge-${o.status}">${o.status}</div>
+          </div>
+
+          ${!isCancelled ? `
+          <div class="status-stepper">
+            <div class="stepper-track ${progressClass}">${dots}</div>
+            <div class="stepper-labels">${labels}</div>
+          </div>` : `
+          <div style="padding:14px 20px 4px;display:flex;align-items:center;gap:8px;color:#999;font-size:0.85rem">
+            <i class="fas fa-times-circle" style="color:#bbb"></i> Pesanan ini dibatalkan
+          </div>`}
+
+          <div class="order-body">
+            <div class="order-info-row">
+              <span>Nama</span>
+              <strong>${o.customer_name}</strong>
+            </div>
+            <div class="order-info-row">
+              <span>Pembayaran</span>
+              <strong>${o.payment_method}</strong>
+            </div>
+            ${items}
+            ${totalInfo}
+            <div class="order-total-row">
+              <span class="label">Total Pembayaran</span>
+              <span class="total">Rp ${Number(o.total).toLocaleString('id-ID')}</span>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    function formatDate(d) {
+      if (!d) return '-';
+      return new Date(d).toLocaleDateString('id-ID', { day: '2-digit', month: 'long', year: 'numeric' });
+    }
+
+    // Cek apakah ada order_id di URL params (dari redirect setelah checkout)
+    document.addEventListener('DOMContentLoaded', () => {
+      updateCartBadge();
+      const params = new URLSearchParams(window.location.search);
+      const orderId = params.get('order_id');
+      if (orderId) {
+        switchTab('order');
+        document.getElementById('inputOrderId').value = orderId;
+        doTrack();
+      }
+    });
+  </script>
+</body>
+</html>
